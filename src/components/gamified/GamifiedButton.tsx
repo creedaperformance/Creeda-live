@@ -6,7 +6,7 @@ import { TOKENS } from "@/lib/design_system_lock";
 
 interface GamifiedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
-  variant?: "PRIMARY" | "GHOST" | "OUTLINE" | "EMERALD" | "ORANGE" | "RED" | "SECONDARY";
+  variant?: "PRIMARY" | "GHOST" | "OUTLINE" | "EMERALD" | "ORANGE" | "RED" | "SECONDARY" | "CHAKRA";
   size?: "SM" | "MD" | "LG" | "XL";
   glow?: boolean;
 }
@@ -20,23 +20,32 @@ export const GamifiedButton: React.FC<GamifiedButtonProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    PRIMARY: "bg-blue-600 text-white hover:bg-blue-500 border-blue-400/30",
-    SECONDARY: "bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700",
+    PRIMARY: "bg-[var(--saffron)] text-black hover:brightness-110 border-[var(--saffron)]/30",
+    SECONDARY: "bg-[#1A1A24] text-slate-200 border-white/[0.08] hover:bg-[#111118]",
+    CHAKRA: "bg-[var(--chakra-neon)]/10 text-[var(--chakra-neon)] border-[var(--chakra-neon)]/30 hover:bg-[var(--chakra-neon)]/20",
     EMERALD: "bg-emerald-600 text-white hover:bg-emerald-500 border-emerald-400/30",
-    ORANGE: "bg-orange-600 text-white hover:bg-orange-500 border-orange-400/30",
+    ORANGE: "bg-[var(--saffron)] text-black hover:brightness-110 border-[var(--saffron)]/30",
     RED: "bg-red-600 text-white hover:bg-red-500 border-red-400/30",
     GHOST: "bg-transparent text-white/70 hover:bg-white/5 border-transparent",
-    OUTLINE: "bg-transparent text-white border-slate-700 hover:border-blue-500/50 hover:bg-blue-500/5",
+    OUTLINE: "bg-transparent text-white border-white/[0.08] hover:border-[var(--saffron)]/30 hover:bg-[var(--saffron)]/5",
   };
 
   const sizeStyles = {
     SM: "px-4 py-2 text-xs",
     MD: "px-6 py-3 text-sm",
     LG: "px-8 py-4 text-base",
-    XL: "px-10 py-5 text-lg font-black tracking-widest uppercase italic font-orbitron",
+    XL: "px-10 py-5 text-lg font-black tracking-widest uppercase",
   };
 
-  const accentColor = variant === "PRIMARY" ? TOKENS.COLORS.ACCENTS.PRIMARY : variant === "EMERALD" ? TOKENS.COLORS.ACCENTS.EMERALD : variant === "ORANGE" ? TOKENS.COLORS.ACCENTS.ORANGE : variant === "RED" ? TOKENS.COLORS.ACCENTS.RED : undefined;
+  const glowMap: Record<string, string | undefined> = {
+    PRIMARY: TOKENS.EFFECTS.GLOW_SAFFRON,
+    CHAKRA: TOKENS.EFFECTS.GLOW_CHAKRA,
+    EMERALD: TOKENS.EFFECTS.GLOW_EMERALD,
+    ORANGE: TOKENS.EFFECTS.GLOW_SAFFRON,
+    RED: TOKENS.EFFECTS.GLOW_RED,
+  };
+
+  const glowShadow = glowMap[variant];
 
   return (
     <button
@@ -44,17 +53,16 @@ export const GamifiedButton: React.FC<GamifiedButtonProps> = ({
         "relative rounded-2xl border transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:pointer-events-none group overflow-hidden",
         variantStyles[variant],
         sizeStyles[size],
-        glow && accentColor && "hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]",
         className
       )}
-      style={glow && accentColor ? { boxShadow: `0 0 15px ${accentColor}30` } : undefined}
+      style={glow && glowShadow ? { boxShadow: glowShadow } : undefined}
       {...props}
     >
       <div className="relative z-10 flex items-center justify-center gap-2">
         {children}
       </div>
       
-      {/* HUD Reflection Line */}
+      {/* Hover reflection */}
       <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
     </button>
   );

@@ -7,19 +7,20 @@ interface HUDLabelProps {
   index: string | number;
   label: string;
   className?: string;
-  accent?: "blue" | "emerald" | "orange" | "red";
+  accent?: "saffron" | "chakra" | "emerald" | "red" | "blue";
 }
 
 export const HUDLabel: React.FC<HUDLabelProps> = ({
   index,
   label,
   className,
-  accent = "blue",
+  accent = "saffron",
 }) => {
   const accentStyles = {
-    blue: "text-blue-500",
+    saffron: "text-[var(--saffron)]",
+    chakra: "text-[var(--chakra-neon)]",
+    blue: "text-[var(--chakra-neon)]",
     emerald: "text-emerald-500",
-    orange: "text-orange-500",
     red: "text-red-500",
   };
 
@@ -28,13 +29,13 @@ export const HUDLabel: React.FC<HUDLabelProps> = ({
   return (
     <div className={cn("flex items-center gap-3 group", className)}>
       <span className={cn(
-        "text-[10px] font-black tracking-[0.3em] font-orbitron",
+        "text-[10px] font-black tracking-[0.3em]",
         accentStyles[accent],
         "opacity-80 group-hover:opacity-100 transition-opacity"
       )}>
         {formattedIndex}
       </span>
-      <span className="h-[1px] w-6 bg-slate-800 group-hover:w-10 transition-all" />
+      <span className="h-[1px] w-6 bg-white/[0.08] group-hover:w-10 group-hover:bg-[var(--saffron)]/30 transition-all" />
       <span className="text-[11px] uppercase font-bold text-white/50 tracking-widest group-hover:text-white/80 transition-colors">
         {label}
       </span>

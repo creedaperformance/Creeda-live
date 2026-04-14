@@ -29,22 +29,22 @@ export const GamifiedProgressBar: React.FC<GamifiedProgressBarProps> = ({
     <div className={cn("w-full flex flex-col gap-4", className)}>
       {showLabels && (
         <div className="flex justify-between items-end mb-2">
-          <span className="text-[10px] uppercase font-black tracking-widest text-blue-500/80 font-orbitron italic">
-            Module Sync Status
+          <span className="text-[10px] uppercase font-black tracking-[0.24em] text-[var(--saffron)]/80">
+            Sync Status
           </span>
-          <span className="text-sm font-black text-white font-orbitron italic">
+          <span className="text-sm font-black text-white">
             {progressValue}%
           </span>
         </div>
       )}
       
-      <div className="relative h-2 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700/50">
+      <div className="relative h-2 w-full bg-white/[0.06] rounded-full overflow-hidden border border-white/[0.04]">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${progressValue}%` }}
           className={cn(
-            "h-full bg-blue-500 transition-all duration-700",
-            showGlow && "shadow-[0_0_15px_rgba(59,130,246,0.6)] glow-blue"
+            "h-full bg-gradient-to-r from-[var(--saffron)] to-[var(--chakra-neon)] transition-all duration-700 rounded-full",
+            showGlow && "shadow-[0_0_15px_var(--saffron-glow)]"
           )}
         />
       </div>

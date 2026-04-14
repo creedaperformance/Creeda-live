@@ -23,7 +23,7 @@ export function BottomNav() {
   if (!shouldShow) return null
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#04070A]/95 backdrop-blur-xl border-t border-white/[0.06] safe-bottom block lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[#0A0A0E]/95 backdrop-blur-xl border-t border-white/[0.04] safe-bottom block lg:hidden">
       <div className="flex justify-around items-center h-16 px-1 max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = tab.path === '/athlete/dashboard'

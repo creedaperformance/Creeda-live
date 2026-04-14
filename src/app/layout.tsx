@@ -15,7 +15,7 @@ const bingSiteVerification = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION;
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
@@ -36,7 +36,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#FF9933",
+  themeColor: "#FF5F1F",
   interactiveWidget: "resizes-content",
 };
 

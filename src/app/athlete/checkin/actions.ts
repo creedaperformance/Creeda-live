@@ -50,6 +50,11 @@ const athleteDailyCheckInSchema = z.object({
 
 type AthleteDailyCheckInInput = z.infer<typeof athleteDailyCheckInSchema>
 
+// Some older databases still use an adaptation_profiles schema without the
+// newer EWMA/progression columns. Cache missing columns once so repeat
+// submissions skip them without noisy retry logs.
+const unsupportedAdaptationProfileColumns = new Set<string>()
+
 export async function submitAthleteDailyCheckIn(rawData: unknown) {
   try {
     const parsed = athleteDailyCheckInSchema.parse(rawData)
@@ -249,6 +254,10 @@ async function upsertAdaptationProfileCompat(
 ) {
   const candidatePayload = { ...payload }
 
+  for (const missingColumn of unsupportedAdaptationProfileColumns) {
+    delete candidatePayload[missingColumn]
+  }
+
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const result = await supabase
       .from('adaptation_profiles')
@@ -261,10 +270,8 @@ async function upsertAdaptationProfileCompat(
       return result.error
     }
 
+    unsupportedAdaptationProfileColumns.add(missingColumn)
     delete candidatePayload[missingColumn]
-    console.warn(
-      `[athlete/checkin] adaptation_profiles missing ${missingColumn}, retrying with legacy payload`
-    )
   }
 
   return { message: 'Failed to persist adaptation profile against legacy schema.' }

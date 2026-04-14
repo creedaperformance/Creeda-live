@@ -3,16 +3,21 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ═══════════════════════════════════════════════════════
-   CREEDA DESIGN SYSTEM v2.0 — Mobile-First India Edition
+   CREEDA DESIGN SYSTEM v3.0 — Neon-Desi Futurism
+   Dark Void + Saffron Glow + Chakra Blue + Indian Energy
    ═══════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Core Indian Palette ── */
-  --saffron: #FF9933;
-  --saffron-light: #FFB366;
-  --saffron-dark: #E67A00;
-  --saffron-glow: rgba(255, 153, 51, 0.4);
-  
+  /* ── Neon-Desi Core Palette ── */
+  --saffron: #FF5F1F;
+  --saffron-light: #FF8C5A;
+  --saffron-dark: #CC4B18;
+  --saffron-glow: rgba(255, 95, 31, 0.4);
+
+  --chakra-neon: #00E5FF;
+  --chakra-deep: #0055FF;
+  --chakra-glow: rgba(0, 229, 255, 0.35);
+
   --indian-green: #138808;
   --indian-green-light: #1DB954;
   --indian-green-dark: #0D6B06;
@@ -20,36 +25,37 @@
 
   --navy: #000080;
   --navy-light: #1A1AFF;
-  --chakra-blue: #0A84FF;
-  --chakra-glow: rgba(10, 132, 255, 0.35);
 
-  /* ── Surfaces ── */
-  --background: #04070A;
-  --background-elevated: #0A0F14;
+  /* ── Void Surfaces ── */
+  --void-900: #0A0A0E;
+  --void-800: #111118;
+  --void-700: #1A1A24;
+  --background: #0A0A0E;
+  --background-elevated: #111118;
   --foreground: #F1F5F9;
-  --card: #0C1117;
+  --card: #111118;
   --card-foreground: #F8FAFC;
-  --card-hover: #111820;
-  
+  --card-hover: #1A1A24;
+
   /* ── Semantic ── */
-  --muted: #1A2030;
+  --muted: #1A1A24;
   --muted-foreground: #94A3B8;
-  --accent: #1A2030;
+  --accent: #1A1A24;
   --accent-foreground: #F8FAFC;
   --border: rgba(255, 255, 255, 0.06);
   --border-bright: rgba(255, 255, 255, 0.12);
-  --input: #0C1117;
+  --input: #111118;
   --ring: var(--saffron);
   --destructive: #EF4444;
   --destructive-foreground: #F8FAFC;
   --radius: 1.25rem;
 
   /* ── Glass ── */
-  --glass-bg: rgba(12, 17, 23, 0.65);
+  --glass-bg: rgba(17, 17, 24, 0.6);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-blur: 16px;
 
-  /* ── Primary (Saffron) ── */
+  /* ── Primary (Saffron Neon) ── */
   --primary: var(--saffron);
   --primary-light: var(--saffron-light);
   --primary-dark: var(--saffron-dark);
@@ -58,16 +64,20 @@
   /* ── Success (Green) ── */
   --success: var(--indian-green-light);
   --success-glow: var(--indian-green-glow);
-  
-  /* ── Info (Chakra Blue) ── */
-  --info: var(--chakra-blue);
+
+  /* ── Info (Chakra Neon) ── */
+  --info: var(--chakra-neon);
   --info-glow: var(--chakra-glow);
 
-  /* ── Gradients ── */
-  --gradient-saffron: linear-gradient(135deg, #FF9933 0%, #FF6B00 100%);
-  --gradient-tricolor: linear-gradient(135deg, #FF9933 0%, #FFFFFF 50%, #138808 100%);
-  --gradient-dark: linear-gradient(180deg, #04070A 0%, #0A0F14 100%);
-  --gradient-card: linear-gradient(145deg, rgba(255,153,51,0.05) 0%, rgba(10,132,255,0.03) 100%);
+  /* ── Neon-Desi Gradients ── */
+  --gradient-saffron: linear-gradient(135deg, #FF5F1F 0%, #FF8C5A 100%);
+  --gradient-desi-aura: linear-gradient(135deg, #FF5F1F 0%, #0055FF 100%);
+  --gradient-readiness-surge: linear-gradient(to top, #0A0A0E, #FF5F1F);
+  --gradient-chakra: linear-gradient(135deg, #00E5FF 0%, #0055FF 100%);
+  --gradient-tricolor: linear-gradient(135deg, #FF5F1F 0%, #FFFFFF 50%, #138808 100%);
+  --gradient-dark: linear-gradient(180deg, #0A0A0E 0%, #111118 100%);
+  --gradient-card: linear-gradient(145deg, rgba(255,95,31,0.05) 0%, rgba(0,229,255,0.03) 100%);
+  --gradient-glass: linear-gradient(114.9deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
   --gradient-glow: radial-gradient(ellipse at center, var(--saffron-glow) 0%, transparent 70%);
 }
 
@@ -81,6 +91,15 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
+
+  /* Neon-Desi Futurism — expose new tokens */
+  --color-void-900: #0A0A0E;
+  --color-void-800: #111118;
+  --color-void-700: #1A1A24;
+  --color-saffron-glow: #FF5F1F;
+  --color-saffron-muted: #FF8C5A;
+  --color-chakra-neon: #00E5FF;
+  --color-chakra-deep: #0055FF;
 
   --font-sans: var(--font-poppins), var(--font-noto-devanagari), 'Poppins', system-ui, sans-serif;
   --font-hindi: var(--font-noto-devanagari), var(--font-poppins), sans-serif;
@@ -104,10 +123,17 @@
 }
 
 @utility bg-glass-strong {
-  background: rgba(12, 17, 23, 0.85);
+  background: rgba(17, 17, 24, 0.85);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@utility bg-glass-neon {
+  background: rgba(17, 17, 24, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 95, 31, 0.1);
 }
 
 @utility bg-gradient-card {
@@ -118,8 +144,12 @@
   background: var(--gradient-saffron);
 }
 
+@utility bg-gradient-desi-aura {
+  background: var(--gradient-desi-aura);
+}
+
 @utility text-glow {
-  text-shadow: 0 0 20px var(--saffron-glow), 0 0 40px rgba(255, 153, 51, 0.15);
+  text-shadow: 0 0 20px var(--saffron-glow), 0 0 40px rgba(255, 95, 31, 0.15);
 }
 
 @utility text-glow-green {
@@ -128,6 +158,10 @@
 
 @utility text-glow-blue {
   text-shadow: 0 0 20px var(--chakra-glow);
+}
+
+@utility text-glow-chakra {
+  text-shadow: 0 0 20px var(--chakra-glow), 0 0 40px rgba(0, 229, 255, 0.15);
 }
 
 @utility shadow-saffron {
@@ -142,9 +176,22 @@
   box-shadow: 0 0 30px var(--chakra-glow), 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
+@utility shadow-neon-saffron {
+  box-shadow: 0 0 15px 0 rgba(255, 95, 31, 0.4);
+}
+
+@utility shadow-neon-chakra {
+  box-shadow: 0 0 15px 0 rgba(0, 229, 255, 0.4);
+}
+
 @utility border-glow {
-  border: 1px solid rgba(255, 153, 51, 0.25);
-  box-shadow: inset 0 0 20px rgba(255, 153, 51, 0.05);
+  border: 1px solid rgba(255, 95, 31, 0.25);
+  box-shadow: inset 0 0 20px rgba(255, 95, 31, 0.05);
+}
+
+@utility border-glow-chakra {
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.05);
 }
 
 @utility safe-bottom {
@@ -152,7 +199,7 @@
 }
 
 /* ═══════════════════════════════
-   ANIMATIONS
+   ANIMATIONS — Neon-Desi Futurism
    ═══════════════════════════════ */
 
 @utility animate-fade-in {
@@ -188,6 +235,20 @@
   animation: spin 8s linear infinite;
 }
 
+@utility animate-orb-breathe {
+  animation: orb-breathe 4s ease-in-out infinite;
+}
+
+@utility animate-streak-burn {
+  animation: streak-burn 1.5s ease-in-out infinite;
+}
+
+@utility skeleton-neon {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 95, 31, 0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: skeleton-sweep 2s ease-in-out infinite;
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -210,7 +271,7 @@
 
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 20px var(--saffron-glow); }
-  50% { box-shadow: 0 0 40px var(--saffron-glow), 0 0 60px rgba(255, 153, 51, 0.15); }
+  50% { box-shadow: 0 0 40px var(--saffron-glow), 0 0 60px rgba(255, 95, 31, 0.15); }
 }
 
 @keyframes shimmer {
@@ -230,6 +291,47 @@
 
 @keyframes progress-fill {
   from { width: 0; }
+}
+
+/* ─── Neon-Desi New Animations ─── */
+
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 60px var(--saffron-glow), 0 0 120px rgba(255, 95, 31, 0.1); }
+  50% { transform: scale(1.05); box-shadow: 0 0 80px var(--saffron-glow), 0 0 160px rgba(255, 95, 31, 0.2); }
+}
+
+@keyframes orb-breathe-chakra {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 60px var(--chakra-glow), 0 0 120px rgba(0, 229, 255, 0.1); }
+  50% { transform: scale(1.05); box-shadow: 0 0 80px var(--chakra-glow), 0 0 160px rgba(0, 229, 255, 0.2); }
+}
+
+@keyframes skeleton-sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes kabaddi-dust {
+  0% { transform: scale(0); opacity: 0.4; }
+  60% { opacity: 0.2; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+@keyframes streak-burn {
+  0%, 100% { opacity: 0.8; transform: scaleY(1) scaleX(1); }
+  25% { opacity: 1; transform: scaleY(1.1) scaleX(0.95); }
+  50% { opacity: 0.9; transform: scaleY(1.05) scaleX(1.02); }
+  75% { opacity: 1; transform: scaleY(1.08) scaleX(0.98); }
+}
+
+@keyframes confetti-pop {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--confetti-x, 30px), var(--confetti-y, -60px)) scale(0); opacity: 0; }
+}
+
+@keyframes neon-border-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* ═══════════════════════════════
@@ -269,7 +371,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ═══════════════════════════════
-   SCROLLBAR (Minimal)
+   SCROLLBAR (Minimal Neon)
    ═══════════════════════════════ */
 
 ::-webkit-scrollbar {
@@ -282,16 +384,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 95, 31, 0.15);
   border-radius: 100px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 95, 31, 0.3);
 }
 
 /* ═══════════════════════════════
-   RANGE INPUT (Mobile-optimized)
+   RANGE INPUT (Neon-Desi)
    ═══════════════════════════════ */
 
 input[type="range"] {
@@ -336,7 +438,7 @@ input[type="range"]::-moz-range-thumb {
    ═══════════════════════════════ */
 
 ::selection {
-  background: rgba(255, 153, 51, 0.25);
+  background: rgba(255, 95, 31, 0.25);
   color: white;
 }
 

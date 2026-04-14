@@ -26,8 +26,8 @@ export const GamifiedCard: React.FC<GamifiedCardProps> = ({
   return (
     <div
       className={cn(
-        "relative rounded-[2rem] border border-slate-800 bg-slate-900/50 backdrop-blur-xl overflow-hidden transition-all duration-500",
-        hover && "hover:border-blue-500/50 hover:bg-slate-900/80 group",
+        "relative rounded-[2rem] border border-white/[0.06] bg-[#111118]/80 backdrop-blur-xl overflow-hidden transition-all duration-500",
+        hover && "hover:border-[var(--saffron)]/30 hover:bg-[#111118] group",
         glow && "shadow-2xl",
         className
       )}
@@ -35,16 +35,16 @@ export const GamifiedCard: React.FC<GamifiedCardProps> = ({
         boxShadow: (glow || glowColor) ? `0 0 30px ${accentColor}${glowColor ? '30' : '20'}` : undefined,
       } as React.CSSProperties}
     >
-      {/* HUD Accent Line */}
+      {/* Neon-Desi Accent Line */}
       <div 
-        className="absolute top-0 left-0 w-full h-[2px] opacity-20 group-hover:opacity-100 transition-opacity"
+        className="absolute top-0 left-0 w-full h-[2px] opacity-20 group-hover:opacity-80 transition-opacity"
         style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }}
       />
       
-      {/* Corner Accents (Optional/SVG) */}
-      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+      {/* Corner Accent */}
+      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-25 transition-opacity">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M0 1H19V20" stroke="white" strokeWidth="2"/>
+          <path d="M0 1H19V20" stroke={accentColor} strokeWidth="2"/>
         </svg>
       </div>
 

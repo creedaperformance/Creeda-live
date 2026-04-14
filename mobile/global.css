@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base Void */
+    --background: #04070A;
+    --background-elevated: #0A0A0E;
+    
+    /* Safar-Glow Core */
+    --saffron: #FF5F1F;
+    --saffron-light: #FF8C5A;
+    --saffron-glow: rgba(255, 95, 31, 0.5);
+    
+    /* Chakra-Neon Core */
+    --chakra-neon: #00E5FF;
+    --chakra-glow: rgba(0, 229, 255, 0.5);
+    
+    /* Shadows */
+    --glow-intensity-low: 0 0 10px;
+    --glow-intensity-mid: 0 0 25px;
+    --glow-intensity-high: 0 0 40px;
+  }
+}

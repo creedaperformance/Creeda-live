@@ -1,8 +1,9 @@
 'use client'
 
 import type { ElementType, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Activity,
   AlertTriangle,
@@ -21,6 +22,8 @@ import {
 
 import { DashboardLayout } from '@/components/DashboardLayout'
 import { Button } from '@/components/ui/button'
+import { ReadinessOrb } from '@/components/neon/ReadinessOrb'
+import { ConfettiBurst } from '@/components/neon/ConfettiBurst'
 import { createClient } from '@/lib/supabase/client'
 import { scrollToTop } from '@/lib/utils'
 
@@ -109,6 +112,7 @@ export default function AthleteCheckInPage() {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<SubmitResult | null>(null)
   const [answeredFields, setAnsweredFields] = useState<Set<string>>(new Set())
+  const [confettiTrigger, setConfettiTrigger] = useState(false)
   const [formData, setFormData] = useState<AthleteCheckInFormState>({
     sleepQuality: '',
     sleepDuration: '',
@@ -249,18 +253,16 @@ export default function AthleteCheckInPage() {
     return (
       <DashboardLayout type="athlete" user={profile}>
         <div className="min-h-[80vh] max-w-md mx-auto px-4 flex flex-col items-center justify-center text-center">
-          <div className="h-28 w-28 rounded-full border-8 border-[var(--saffron)] bg-[var(--saffron)]/10 flex items-center justify-center shadow-[0_0_40px_var(--saffron-glow)] mb-8">
-            <span className="text-3xl font-black text-white">{result.readinessScore}</span>
-          </div>
-          <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[var(--saffron)] mb-3">
+          <ReadinessOrb score={result.readinessScore} status={result.decision} />
+          <p className="text-[10px] font-black uppercase tracking-[0.35em] text-[var(--saffron)] mb-3 mt-4">
             Today&apos;s Plan
           </p>
           <h1 className="text-4xl font-black text-white tracking-tight mb-3">{result.decision}</h1>
-          <p className="text-sm text-slate-300 leading-relaxed mb-4">{result.action}</p>
-          <p className="text-xs text-slate-500 leading-relaxed mb-8">{result.reason}</p>
+          <p className="text-sm text-white/50 leading-relaxed mb-4">{result.action}</p>
+          <p className="text-xs text-white/30 leading-relaxed mb-8">{result.reason}</p>
           <Button
             onClick={() => router.push('/athlete/dashboard')}
-            className="w-full h-14 rounded-2xl bg-[var(--saffron)] text-black font-black uppercase tracking-widest text-xs"
+            className="w-full h-14 rounded-2xl bg-[var(--saffron)] text-black font-black uppercase tracking-widest text-xs shadow-[0_0_30px_var(--saffron-glow)]"
           >
             Open Dashboard
           </Button>
@@ -273,6 +275,7 @@ export default function AthleteCheckInPage() {
 
   return (
     <DashboardLayout type="athlete" user={profile}>
+      <ConfettiBurst trigger={confettiTrigger} />
       <div className="max-w-md mx-auto px-4 pb-28">
         <div className="pt-6 pb-8">
           <div className="flex items-center justify-between mb-3">
@@ -285,7 +288,7 @@ export default function AthleteCheckInPage() {
           </div>
           <div className="h-2 w-full rounded-full bg-white/[0.06] overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[var(--saffron)] to-[#f97316] transition-all duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-[var(--saffron)] to-[var(--chakra-neon)] transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -303,8 +306,16 @@ export default function AthleteCheckInPage() {
           </div>
         </div>
 
+        <AnimatePresence mode="wait">
         {step === 0 && (
-          <div className="space-y-8">
+          <motion.div
+            key="step-0"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="space-y-8"
+          >
             <Section label="Sleep quality" icon={Moon}>
               <CardGrid>
                 {sleepQualities.map((item) => (
@@ -312,7 +323,13 @@ export default function AthleteCheckInPage() {
                     key={item}
                     label={item}
                     active={formData.sleepQuality === item}
-                    onClick={() => patchForm({ sleepQuality: item })}
+                    onClick={() => {
+                      patchForm({ sleepQuality: item })
+                      if (item === 'Excellent' || item === 'Good') {
+                        setConfettiTrigger(true)
+                        setTimeout(() => setConfettiTrigger(false), 100)
+                      }
+                    }}
                   />
                 ))}
               </CardGrid>
@@ -343,11 +360,18 @@ export default function AthleteCheckInPage() {
                 ))}
               </CardGrid>
             </Section>
-          </div>
+          </motion.div>
         )}
 
         {step === 1 && (
-          <div className="space-y-8">
+          <motion.div
+            key="step-1"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="space-y-8"
+          >
             <Section label="Energy level" icon={Zap}>
               <div className="grid grid-cols-1 gap-3">
                 {energyLevels.map((item) => (
@@ -355,7 +379,13 @@ export default function AthleteCheckInPage() {
                     key={item}
                     label={item}
                     active={formData.energyLevel === item}
-                    onClick={() => patchForm({ energyLevel: item })}
+                    onClick={() => {
+                      patchForm({ energyLevel: item })
+                      if (item === 'Peak' || item === 'High') {
+                        setConfettiTrigger(true)
+                        setTimeout(() => setConfettiTrigger(false), 100)
+                      }
+                    }}
                   />
                 ))}
               </div>
@@ -373,7 +403,7 @@ export default function AthleteCheckInPage() {
                 ))}
               </CardGrid>
             </Section>
-          </div>
+          </motion.div>
         )}
 
         {step === 2 && (
@@ -659,11 +689,13 @@ export default function AthleteCheckInPage() {
               <SummaryRow label="Context" value={formatAthleteContextSummary(formData)} />
             </div>
 
-            <div className="rounded-3xl border border-[var(--saffron)]/20 bg-[var(--saffron)]/8 p-5 text-sm text-slate-300 leading-relaxed">
+            <div className="rounded-3xl border border-[var(--saffron)]/20 bg-[var(--saffron)]/8 p-5 text-sm text-white/50 leading-relaxed">
               CREEDA will use this check-in to set today&apos;s athlete decision and sync the same result into your dashboard.
             </div>
           </div>
         )}
+        </AnimatePresence>
+
 
         {error && (
           <div className="mt-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">

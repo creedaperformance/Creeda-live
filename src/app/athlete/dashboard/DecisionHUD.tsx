@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Activity, BarChart3, Brain, ClipboardCheck, Timer, Video, Zap } from "lucide-react";
+import { ReadinessOrb } from "@/components/neon/ReadinessOrb";
 
 import type { AthleteHealthSummary, ObjectiveTestSummary } from "@/lib/dashboard_decisions";
 import type { CreedaDecision, OrchestratorOutputV5 } from "@/lib/engine/types";
@@ -65,17 +66,17 @@ export const DecisionHUD: React.FC<DecisionHUDProps> = ({
   if (!decision) {
     return (
       <div className="min-h-screen bg-[var(--background)] text-white p-4 md:p-6 md:pl-72 pb-24 md:pb-6">
-        <div className="max-w-2xl mx-auto pt-12 text-center">
-          <div className="text-5xl mb-6">🧠</div>
-          <h1 className="text-2xl font-extrabold text-white mb-3 tracking-tight">
+        <div className="max-w-2xl mx-auto pt-8 text-center">
+          <ReadinessOrb score={0} status="Awaiting Check-In" isLoading />
+          <h1 className="text-2xl font-black text-white mb-3 tracking-tight">
             Your Sports Scientist is Ready
           </h1>
-          <p className="text-sm text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
+          <p className="text-sm text-white/40 mb-8 max-w-md mx-auto leading-relaxed">
             Complete today&apos;s check-in so CREEDA can make one authoritative training decision for you.
           </p>
           <Link
             href="/athlete/checkin"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[var(--saffron)] text-black font-bold text-sm hover:brightness-110 transition-all shadow-[0_0_30px_var(--saffron-glow)]"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[var(--saffron)] text-black font-bold text-sm hover:brightness-110 transition-all shadow-[0_0_30px_var(--saffron-glow)]"
           >
             <ClipboardCheck className="w-4 h-4" />
             Start Check-In
@@ -97,22 +98,22 @@ export const DecisionHUD: React.FC<DecisionHUDProps> = ({
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between"
+            className="p-3 rounded-2xl bg-[var(--chakra-neon)]/10 border border-[var(--chakra-neon)]/20 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <div className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400">
+              <div className="p-1.5 rounded-lg bg-[var(--chakra-neon)]/20 text-[var(--chakra-neon)]">
                 <Zap className="w-3.5 h-3.5" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest leading-none mb-1">
+                <span className="text-[10px] font-bold text-[var(--chakra-neon)] uppercase tracking-widest leading-none mb-1">
                   Calibration Phase
                 </span>
-                <span className="text-[11px] font-medium text-blue-100/80">
+                <span className="text-[11px] font-medium text-[var(--chakra-neon)]/80">
                   Scaling your performance model from real training responses.
                 </span>
               </div>
             </div>
-            <div className="px-2 py-1 rounded-md bg-blue-500/20 text-[10px] font-bold text-blue-400 uppercase">
+            <div className="px-2 py-1 rounded-md bg-[var(--chakra-neon)]/20 text-[10px] font-bold text-[var(--chakra-neon)] uppercase">
               Exp: {calibrationSessionCount}/5
             </div>
           </motion.div>
@@ -181,7 +182,7 @@ export const DecisionHUD: React.FC<DecisionHUDProps> = ({
               Expand only when you want the deeper why, constraints, forecast, and sport science references.
             </p>
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-300">
+          <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--chakra-neon)]">
             {showDeepScience ? "Hide" : "Show"}
           </span>
         </button>
@@ -213,17 +214,17 @@ export const DecisionHUD: React.FC<DecisionHUDProps> = ({
             className="w-full flex items-center justify-between p-5 rounded-3xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 group-hover:bg-blue-500/20 transition-all">
+              <div className="p-2 rounded-xl bg-[var(--chakra-neon)]/10 border border-[var(--chakra-neon)]/20 text-[var(--chakra-neon)] group-hover:bg-[var(--chakra-neon)]/20 transition-all">
                 <Activity className="w-4 h-4" />
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none mb-1">
+                <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest leading-none mb-1">
                   Scientific Insights
                 </span>
                 <span className="text-xs font-bold text-white">Why this decision?</span>
               </div>
             </div>
-            <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest bg-blue-500/10 px-2 py-1 rounded-md">
+            <span className="text-[10px] font-bold text-[var(--chakra-neon)] uppercase tracking-widest bg-[var(--chakra-neon)]/10 px-2 py-1 rounded-md">
               View Metrics
             </span>
           </motion.button>
@@ -255,8 +256,8 @@ export const DecisionHUD: React.FC<DecisionHUDProps> = ({
             disabled={isPending}
             className={`flex items-center justify-center gap-2 py-3.5 rounded-2xl border transition-all text-xs font-bold uppercase tracking-wider ${
               isPending
-                ? "bg-blue-500/10 border-blue-500/20 text-blue-400 animate-pulse"
-                : "bg-white/[0.03] border-white/[0.06] text-slate-400 hover:bg-white/[0.05]"
+                ? "bg-[var(--chakra-neon)]/10 border-[var(--chakra-neon)]/20 text-[var(--chakra-neon)] animate-pulse"
+                : "bg-white/[0.03] border-white/[0.06] text-white/40 hover:bg-white/[0.05]"
             }`}
           >
             <Zap className="w-4 h-4" />
@@ -502,8 +503,8 @@ function AthleteTrustCard({
       )}
 
       {trustSummary.nextBestInputs.length > 0 && (
-        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">Best next inputs</p>
+        <div className="rounded-2xl border border-[var(--chakra-neon)]/20 bg-[var(--chakra-neon)]/10 px-4 py-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--chakra-neon)]">Best next inputs</p>
           <p className="mt-2 text-xs text-blue-100/80 leading-relaxed">
             {trustSummary.nextBestInputs.join(" ")}
           </p>

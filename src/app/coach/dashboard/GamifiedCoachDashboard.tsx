@@ -22,15 +22,15 @@ export const GamifiedCoachDashboard: React.FC<Props> = ({ videoReports, lockerCo
   const [coachQuery, setCoachQuery] = useState("");
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6 md:pl-72 pb-24 md:pb-6">
+    <div className="min-h-screen bg-[var(--background)] text-white p-6 md:pl-72 pb-24 md:pb-6">
       <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <div className="flex items-center gap-3 mb-2">
             <HUDLabel index="01" label="Command Center Active" />
             <div className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black italic font-orbitron uppercase tracking-tighter">
-            Coach<span className="text-blue-500">INTEL</span>
+          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">
+            Coach<span className="text-[var(--saffron)]">INTEL</span>
           </h1>
         </div>
         <div className="flex items-center gap-4">
@@ -41,7 +41,7 @@ export const GamifiedCoachDashboard: React.FC<Props> = ({ videoReports, lockerCo
                 value={coachQuery}
                 onChange={(event) => setCoachQuery(event.target.value)}
                 placeholder="Search athlete, team, reason..." 
-                className="bg-slate-900/50 border border-slate-800 rounded-xl py-2 pl-10 pr-4 text-xs font-bold font-orbitron uppercase tracking-widest focus:outline-none focus:border-blue-500/50 transition-all w-64"
+                className="bg-[#111118] border border-white/[0.06] rounded-xl py-2 pl-10 pr-4 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-[var(--chakra-neon)]/50 focus:shadow-[0_0_10px_var(--chakra-glow)] transition-all w-64 text-white placeholder:text-white/25"
               />
            </div>
            <Link href="/coach/academy">
@@ -60,7 +60,7 @@ export const GamifiedCoachDashboard: React.FC<Props> = ({ videoReports, lockerCo
           <div className="pt-4 border-t border-slate-800/50">
              <div className="flex items-center gap-3 mb-6 px-2">
                 <Video className="h-4 w-4 text-primary" />
-                <h3 className="text-sm font-black italic uppercase tracking-widest text-white font-orbitron">Squad Technical Repository</h3>
+                <h3 className="text-sm font-black uppercase tracking-widest text-white">Squad Technical Repository</h3>
              </div>
              <CoachVideoTerminal reports={videoReports} />
           </div>
@@ -75,7 +75,7 @@ export const GamifiedCoachDashboard: React.FC<Props> = ({ videoReports, lockerCo
               data-testid="coach-locker-code-card"
             >
               <div
-                className="text-3xl font-black font-orbitron italic tracking-[0.2em] text-blue-500"
+                className="text-3xl font-black tracking-[0.2em] text-[var(--chakra-neon)]"
                 data-testid="coach-locker-code-value"
               >
                 {lockerCode || state.squadData[0]?.invite_code || "N/A"}
@@ -90,15 +90,15 @@ export const GamifiedCoachDashboard: React.FC<Props> = ({ videoReports, lockerCo
             <HUDLabel index="05" label="Operational Compliance" />
             <div className="mt-4 space-y-4">
                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase font-orbitron">Daily Log Participation</span>
-                  <span className="text-xs font-black text-white font-orbitron">
+                  <span className="text-[10px] font-bold text-white/30 uppercase">Daily Log Participation</span>
+                  <span className="text-xs font-black text-white">
                     {state.squadData[0]?.members.length > 0 ? '92%' : '0%'}
                   </span>
                </div>
                <GamifiedProgressBar progress={state.squadData[0]?.members.length > 0 ? 92 : 0} showGlow />
                <div className="flex items-center justify-between pt-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase font-orbitron">Avg Team Readiness</span>
-                  <span className="text-xs font-black text-emerald-500 font-orbitron">
+                  <span className="text-[10px] font-bold text-white/30 uppercase">Avg Team Readiness</span>
+                  <span className="text-xs font-black text-[var(--chakra-neon)]">
                     {state.squadData[0]?.members.reduce((acc, m) => acc + m.readiness_score, 0) / (state.squadData[0]?.members.length || 1) | 0}
                   </span>
                </div>
@@ -113,7 +113,7 @@ export const GamifiedCoachDashboard: React.FC<Props> = ({ videoReports, lockerCo
             <div className="mt-4 grid gap-3">
               <Link
                 href="/coach/review"
-                className="flex items-center justify-between rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs font-bold uppercase tracking-[0.18em] text-blue-200 hover:bg-blue-500/15 transition-all"
+                className="flex items-center justify-between rounded-2xl border border-[var(--saffron)]/20 bg-[var(--saffron)]/10 px-4 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--saffron-light)] hover:bg-[var(--saffron)]/15 transition-all"
               >
                 <span className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
@@ -138,18 +138,18 @@ export const GamifiedCoachDashboard: React.FC<Props> = ({ videoReports, lockerCo
             <HUDLabel index="07" label="Academy Layer" />
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-slate-500 uppercase font-orbitron">Teams</span>
-                <span className="text-xs font-black text-white font-orbitron">{state.squadData.length}</span>
+                  <span className="text-[10px] font-bold text-white/30 uppercase">Teams</span>
+                  <span className="text-xs font-black text-white">{state.squadData.length}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-slate-500 uppercase font-orbitron">Junior Athletes</span>
-                <span className="text-xs font-black text-blue-400 font-orbitron">
+                  <span className="text-[10px] font-bold text-white/30 uppercase">Junior Athletes</span>
+                  <span className="text-xs font-black text-[var(--chakra-neon)]">
                   {state.squadData.reduce((acc, team) => acc + team.members.filter((member) => member.is_junior).length, 0)}
                 </span>
               </div>
               <Link
                 href="/coach/academy"
-                className="flex items-center justify-between rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs font-bold uppercase tracking-[0.18em] text-blue-200 hover:bg-blue-500/15 transition-all"
+                className="flex items-center justify-between rounded-2xl border border-[var(--saffron)]/20 bg-[var(--saffron)]/10 px-4 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--saffron-light)] hover:bg-[var(--saffron)]/15 transition-all"
               >
                 <span className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
@@ -160,13 +160,13 @@ export const GamifiedCoachDashboard: React.FC<Props> = ({ videoReports, lockerCo
             </div>
           </GamifiedCard>
 
-          <div className="p-5 rounded-2xl border border-blue-500/20 bg-blue-500/5 space-y-4">
+          <div className="p-5 rounded-2xl border border-[var(--saffron)]/20 bg-[var(--saffron)]/5 space-y-4">
              <div className="flex items-center justify-between">
                  <div className="flex items-center gap-3">
-                    <Database className="w-5 h-5 text-blue-500" />
-                    <span className="text-[10px] font-black uppercase text-white font-orbitron">V5 Engine Node</span>
+                    <Database className="w-5 h-5 text-[var(--saffron)]" />
+                    <span className="text-[10px] font-black uppercase text-white">V5 Engine Node</span>
                  </div>
-                 <div className="px-2 py-0.5 rounded-full bg-blue-500 text-[8px] font-black text-white uppercase">Active</div>
+                 <div className="px-2 py-0.5 rounded-full bg-[var(--saffron)] text-[8px] font-black text-black uppercase">Active</div>
              </div>
              <p className="text-[9px] text-slate-500 font-bold uppercase leading-relaxed">
                 Centralizing multi-athlete adaptation cycles into a unified coaching stream.

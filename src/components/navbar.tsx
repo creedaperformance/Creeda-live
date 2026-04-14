@@ -78,7 +78,7 @@ export function Navbar() {
             <Button
               asChild
               size="sm"
-              className="hidden sm:inline-flex h-9 px-5 rounded-full bg-[var(--saffron)] text-black font-bold text-xs hover:brightness-110 transition-all shadow-lg shadow-[var(--saffron-glow)]"
+              className="hidden sm:inline-flex h-9 px-5 rounded-full bg-[var(--saffron)] text-black font-bold text-xs hover:brightness-110 transition-all shadow-[0_0_20px_var(--saffron-glow)]"
             >
               <Link href={signupLink} prefetch={false}>
                 {loginText}

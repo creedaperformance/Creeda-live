@@ -42,7 +42,7 @@ function SidebarItem({ href, icon: Icon, label, active, badge }: SidebarItemProp
         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
           active
             ? 'bg-[var(--saffron)]/10 text-[var(--saffron)] border border-[var(--saffron)]/15'
-            : 'text-white/40 hover:bg-white/[0.04] hover:text-white/70'
+            : 'text-white/30 hover:bg-white/[0.04] hover:text-white/60'
         }`}
       >
         <Icon
@@ -135,11 +135,11 @@ export function DashboardLayout({ children, user, type, hasSyncedToday }: Dashbo
   return (
     <div className="min-h-[100dvh] bg-[var(--background)] text-white flex relative overflow-hidden">
       {/* ── Desktop Sidebar ── */}
-      <aside className="hidden lg:flex w-60 flex-col bg-[var(--background-elevated)] border-r border-white/[0.04] sticky top-0 h-screen z-50">
+      <aside className="hidden lg:flex w-60 flex-col bg-[#0A0A0E] border-r border-white/[0.04] sticky top-0 h-screen z-50">
         {/* Logo */}
         <div className="p-6 mb-2">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="h-9 w-9 rounded-xl bg-[var(--saffron)] flex items-center justify-center shadow-lg shadow-[var(--saffron-glow)]">
+            <div className="h-9 w-9 rounded-xl bg-[var(--saffron)] flex items-center justify-center shadow-[0_0_20px_var(--saffron-glow)]">
               <Activity className="text-black h-5 w-5" strokeWidth={3} />
             </div>
             <span className="text-lg font-extrabold tracking-tight text-white group-hover:text-[var(--saffron)] transition-colors">
@@ -166,7 +166,7 @@ export function DashboardLayout({ children, user, type, hasSyncedToday }: Dashbo
         {/* User Info */}
         <div className="p-4 mt-auto border-t border-white/[0.04]">
           <div className="flex items-center gap-3 px-2 mb-3">
-            <div className="h-9 w-9 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-sm font-bold text-white/60">
+            <div className="h-9 w-9 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-sm font-bold text-white/50">
               {user?.email?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
@@ -192,7 +192,7 @@ export function DashboardLayout({ children, user, type, hasSyncedToday }: Dashbo
       {/* ── Main Content ── */}
       <main className="flex-1 min-w-0 relative h-[100dvh] overflow-y-auto">
         {/* Mobile Header */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-[var(--background)]/90 backdrop-blur-xl border-b border-white/[0.04] sticky top-0 z-50">
+        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#0A0A0E]/95 backdrop-blur-xl border-b border-white/[0.04] sticky top-0 z-50">
           <Link href="/" className="flex items-center gap-2">
             <div className="h-7 w-7 rounded-lg bg-[var(--saffron)] flex items-center justify-center">
               <Activity className="text-black h-4 w-4" strokeWidth={3} />
@@ -220,10 +220,10 @@ export function DashboardLayout({ children, user, type, hasSyncedToday }: Dashbo
 
         {/* Page Content */}
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto pb-24 lg:pb-8">
-          <section className="mb-5 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200">Safety & Legal</p>
-            <p className="mt-2 text-sm text-amber-100/90 leading-relaxed">{CORE_MEDICAL_DISCLAIMER}</p>
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-amber-100/80">
+          <section className="mb-5 rounded-2xl border border-[var(--saffron)]/15 bg-[var(--saffron)]/5 p-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--saffron)]">Safety & Legal</p>
+            <p className="mt-2 text-sm text-white/50 leading-relaxed">{CORE_MEDICAL_DISCLAIMER}</p>
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/40">
               <Link href={LEGAL_DOC_PATHS.disclaimer} className="underline underline-offset-4 hover:text-white">
                 Medical Disclaimer
               </Link>
@@ -270,7 +270,7 @@ export function DashboardLayout({ children, user, type, hasSyncedToday }: Dashbo
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 250 }}
-              className="absolute right-0 top-0 bottom-0 w-[80%] max-w-xs bg-[var(--background-elevated)] border-l border-white/[0.06] shadow-2xl p-6"
+              className="absolute right-0 top-0 bottom-0 w-[80%] max-w-xs bg-[#0A0A0E] border-l border-white/[0.06] shadow-2xl p-6"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}

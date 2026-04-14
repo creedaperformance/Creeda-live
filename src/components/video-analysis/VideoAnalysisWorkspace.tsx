@@ -736,10 +736,15 @@ function drawSkeletons(
   height: number,
   isError = false
 ) {
-  const primaryColor = isError ? '#EF4444' : '#FF9933'
-  const nodeColor = '#FFFFFF'
+  // Neon-Desi Futurism: Chakra-Blue for normal, Saffron for error
+  const primaryColor = isError ? '#FF5F1F' : '#00E5FF'
+  const nodeColor = isError ? '#FF8C5A' : '#FFFFFF'
 
-  ctx.lineWidth = 4
+  // Add bloom/glow effect
+  ctx.shadowBlur = 12
+  ctx.shadowColor = primaryColor
+
+  ctx.lineWidth = 5
   ctx.strokeStyle = primaryColor
   ctx.fillStyle = nodeColor
 
@@ -770,10 +775,18 @@ function drawSkeletons(
   })
   ctx.stroke()
 
+  // Reset shadow for nodes
+  ctx.shadowBlur = 6
+  ctx.shadowColor = primaryColor
+
   landmarks.forEach((point) => {
     if (point.visibility && point.visibility < 0.5) return
     ctx.beginPath()
-    ctx.arc(point.x * width, point.y * height, 4, 0, Math.PI * 2)
+    ctx.arc(point.x * width, point.y * height, 5, 0, Math.PI * 2)
     ctx.fill()
   })
+
+  // Reset shadow
+  ctx.shadowBlur = 0
+  ctx.shadowColor = 'transparent'
 }
