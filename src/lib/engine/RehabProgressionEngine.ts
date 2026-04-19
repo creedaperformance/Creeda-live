@@ -1,13 +1,12 @@
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 
 export class RehabProgressionEngine {
-  private supabase = createClient();
-
   /**
    * Assesses rehab logs and computes the next sensible stage.
    */
   async evaluateProgression(userId: string, injuryType: string): Promise<{ stage: number; flag: string }> {
-    const { data: history } = await this.supabase
+    const supabase = await createClient();
+    const { data: history } = await supabase
       .from('rehab_history')
       .select('stage, pain_score, timestamp')
       .eq('user_id', userId)

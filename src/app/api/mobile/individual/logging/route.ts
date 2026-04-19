@@ -6,7 +6,6 @@ import {
   logIndividualSignalForUser,
 } from '@/lib/individual-logging'
 import { authenticateMobileApiRequest } from '@/lib/mobile/auth'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -34,15 +33,15 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
   const response = await logIndividualSignalForUser({
-    supabase,
+    supabase: auth.supabase,
     userId: auth.user.userId,
     payload: parsed.data,
   })
 
   if ('error' in response) {
-    return NextResponse.json({ error: response.error }, { status: 500 })
+    const status = /invalid|missing|required|not found|complete onboarding/i.test(response.error) ? 422 : 500
+    return NextResponse.json({ error: response.error }, { status })
   }
 
   revalidatePath('/individual')

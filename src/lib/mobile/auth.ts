@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
+import { getPublicSupabaseEnv } from '@/lib/env'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getRoleHomeRoute, getRoleOnboardingRoute, isAppRole, type AppRole } from '@/lib/role_routes'
 import { jsonError } from '@/lib/security/http'
@@ -21,11 +23,27 @@ export interface MobileAuthenticatedUser {
 }
 
 type MobileAuthResult =
-  | { ok: true; user: MobileAuthenticatedUser }
+  | { ok: true; user: MobileAuthenticatedUser; supabase: SupabaseClient }
   | { ok: false; response: NextResponse }
 
 function unauthorized(request: NextRequest) {
   return jsonError(request, 401, 'Unauthorized.')
+}
+
+function createMobileUserClient(accessToken: string) {
+  const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } = getPublicSupabaseEnv()
+
+  return createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+    global: {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  })
 }
 
 export async function authenticateMobileApiRequest(
@@ -42,13 +60,14 @@ export async function authenticateMobileApiRequest(
   }
 
   const admin = createAdminClient()
+  const supabase = createMobileUserClient(token)
   const { data: authData, error: authError } = await admin.auth.getUser(token)
 
   if (authError || !authData?.user) {
     return { ok: false, response: unauthorized(request) }
   }
 
-  const { data: resolvedProfile, error: resolvedProfileError } = await admin
+  const { data: resolvedProfile, error: resolvedProfileError } = await supabase
     .from('profiles')
     .select(
       'id, role, full_name, username, avatar_url, mobile_number, primary_sport, position, onboarding_completed'
@@ -72,6 +91,7 @@ export async function authenticateMobileApiRequest(
 
   return {
     ok: true,
+    supabase,
     user: {
       userId: authData.user.id,
       email: authData.user.email || null,

@@ -2,7 +2,6 @@ import 'server-only'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizeVideoAnalysisReport, type VideoAnalysisReportSummary } from '@/lib/video-analysis/reporting'
 
 type SupabaseLike = SupabaseClient
@@ -23,13 +22,6 @@ function normalizeProfileSummary(value: TeamMemberReportRow['profiles']) {
     athleteName: String(profile?.full_name || 'Athlete'),
     athleteAvatarUrl: profile?.avatar_url ? String(profile.avatar_url) : null,
   }
-}
-
-function getReportClient(supabase: SupabaseLike) {
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return createAdminClient()
-  }
-  return supabase
 }
 
 export async function getUserVideoReports(
@@ -89,8 +81,7 @@ export async function getCoachVideoReports(
   const athleteIds = athleteRows.map((row) => String(row.athlete_id || '')).filter(Boolean)
   if (!athleteIds.length) return []
 
-  const reportClient = getReportClient(supabase)
-  const { data: reportRows, error: reportsError } = await reportClient
+  const { data: reportRows, error: reportsError } = await supabase
     .from('video_analysis_reports')
     .select('*')
     .in('user_id', athleteIds)
@@ -124,8 +115,7 @@ export async function getCoachVideoReportById(
   coachId: string,
   reportId: string
 ): Promise<(VideoAnalysisReportSummary & { athleteName: string; athleteAvatarUrl: string | null }) | null> {
-  const reportClient = getReportClient(supabase)
-  const { data: rawReport, error: reportError } = await reportClient
+  const { data: rawReport, error: reportError } = await supabase
     .from('video_analysis_reports')
     .select('*')
     .eq('id', reportId)

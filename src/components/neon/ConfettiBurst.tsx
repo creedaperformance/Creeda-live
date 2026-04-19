@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface ConfettiBurstProps {
@@ -25,8 +25,13 @@ export const ConfettiBurst: React.FC<ConfettiBurstProps> = ({
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
   const idCounter = useRef(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const burst = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
     const newParticles: Particle[] = [];
     for (let i = 0; i < 16; i++) {
       idCounter.current += 1;
@@ -43,18 +48,37 @@ export const ConfettiBurst: React.FC<ConfettiBurstProps> = ({
     }
     setParticles(newParticles);
 
-    setTimeout(() => setParticles([]), 800);
+    timeoutRef.current = setTimeout(() => {
+      setParticles([]);
+      timeoutRef.current = null;
+    }, 800);
   }, [colors]);
 
   // Trigger on prop change
   const lastTrigger = useRef(false);
-  if (trigger && !lastTrigger.current) {
-    lastTrigger.current = true;
-    // Use microtask to avoid setState during render
-    queueMicrotask(burst);
-  } else if (!trigger) {
-    lastTrigger.current = false;
-  }
+
+  useEffect(() => {
+    if (trigger && !lastTrigger.current) {
+      lastTrigger.current = true;
+      const frame = window.requestAnimationFrame(() => {
+        burst();
+      });
+
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    if (!trigger) {
+      lastTrigger.current = false;
+    }
+  }, [burst, trigger]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[200] flex items-center justify-center overflow-hidden">

@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import * as z from 'zod'
 
 import { authenticateMobileApiRequest } from '@/lib/mobile/auth'
-import { handleApiError, jsonError, jsonResponse } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { jsonError, jsonResponse } from '@/lib/security/http'
 
 const avatarPayloadSchema = z.object({
   avatarUrl: z.string().url('A valid avatar URL is required.'),
@@ -34,8 +33,7 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  const admin = createAdminClient()
-  const { error } = await admin
+  const { error } = await auth.supabase
     .from('profiles')
     .update({
       avatar_url: parsed.data.avatarUrl,
@@ -58,8 +56,7 @@ export async function DELETE(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
   if (!auth.ok) return auth.response
 
-  const admin = createAdminClient()
-  const { error } = await admin
+  const { error } = await auth.supabase
     .from('profiles')
     .update({
       avatar_url: null,

@@ -45,6 +45,7 @@ export async function generateCreedaDecision(params: {
     readiness, risk, confidence, history, uncertainty,
     painLevel, adaptation, rehab, visionFaults, sport, position, profile, adherence, userId, dailyContext
   } = params;
+  void adaptation;
 
   const timestamp = new Date().toISOString();
   const priorityChain: string[] = [];
@@ -138,14 +139,14 @@ export async function generateCreedaDecision(params: {
   }
 
   // ─── 4. PSYCHOLOGY NUDGES (Fix #2 & #6) ──────────────────────────────────
-  const motivation = params.readiness.factors.stress; // Using stress/mental as proxy for motivation if not explicit
-  if (motivation < 20) {
+  const stressReadiness = params.readiness.factors.stress; // 100 means low stress / mentally ready.
+  if (stressReadiness < 20) {
     duration = Math.max(20, Math.round(duration * 0.7)); // Level 2: Abbreviate session
     intensity = Math.min(intensity, 40);
-    priorityChain.push('PSYCHOLOGY: Critical motivation drop → Abbreviated session');
-  } else if (motivation < 40) {
+    priorityChain.push('PSYCHOLOGY: Critical stress readiness drop → Abbreviated session');
+  } else if (stressReadiness < 40) {
     // Level 1: Handled in buildConstraints/buildComponents by simplifying
-    priorityChain.push('PSYCHOLOGY: Low motivation detected → Simplified complexity');
+    priorityChain.push('PSYCHOLOGY: Low stress readiness detected → Simplified complexity');
   }
 
   // ─── 4. REHAB OVERRIDE ────────────────────────────────────────────────
@@ -180,43 +181,44 @@ export async function generateCreedaDecision(params: {
       : null,
   });
 
-  const workoutPlan = await workoutGenerator.generateDailyWorkout({
-    userId,
-    sessionType: decision,
-    readinessScore: readiness.score,
-    injuryRiskScore: risk.score,
-    activeInjuries,
-    sport,
-    position,
-    goal: normalizeNutritionGoal(profile?.primaryGoal),
-    experienceLevel: normalizeExperienceLevel(profile?.activityLevel, sport, history.length),
-    calibration: {
-      active: confidence.mode === 'cold_start' || dataCompleteness < 45,
-      sessionCount: history.length,
-    },
-    visionFaults,
-    sportProfile: scientificContext.sportProfile,
-    conditioningContext: scientificContext.conditioning,
-  });
-
-  const mealPlan = await nutritionGenerator.buildDailyNutrition(
-    userId,
-    normalizeNutritionGoal(profile?.primaryGoal),
-    sanitizePositiveMetric(profile?.weightKg, 75, 30, 250),
-    sanitizePositiveMetric(profile?.heightCm, 175, 120, 230),
-    sanitizePositiveMetric(profile?.age, 28, 8, 90),
-    inferAthleteTimingPreference(profile?.wakeTime),
-    normalizeActivityLevel(profile?.activityLevel, sport),
-    profile?.biologicalSex || profile?.gender || 'unknown',
-    undefined,
-    {
+  const [workoutPlan, mealPlan] = await Promise.all([
+    workoutGenerator.generateDailyWorkout({
+      userId,
       sessionType: decision,
+      readinessScore: readiness.score,
+      injuryRiskScore: risk.score,
+      activeInjuries,
       sport,
       position,
+      goal: normalizeNutritionGoal(profile?.primaryGoal),
+      experienceLevel: normalizeExperienceLevel(profile?.activityLevel, sport, history.length),
+      calibration: {
+        active: confidence.mode === 'cold_start' || dataCompleteness < 45,
+        sessionCount: history.length,
+      },
+      visionFaults,
       sportProfile: scientificContext.sportProfile,
-      nutritionGuidance: scientificContext.nutrition,
-    }
-  );
+      conditioningContext: scientificContext.conditioning,
+    }),
+    nutritionGenerator.buildDailyNutrition(
+      userId,
+      normalizeNutritionGoal(profile?.primaryGoal),
+      sanitizePositiveMetric(profile?.weightKg, 75, 30, 250),
+      sanitizePositiveMetric(profile?.heightCm, 175, 120, 230),
+      sanitizePositiveMetric(profile?.age, 28, 8, 90),
+      inferAthleteTimingPreference(profile?.wakeTime),
+      normalizeActivityLevel(profile?.activityLevel, sport),
+      profile?.biologicalSex || profile?.gender || 'unknown',
+      undefined,
+      {
+        sessionType: decision,
+        sport,
+        position,
+        sportProfile: scientificContext.sportProfile,
+        nutritionGuidance: scientificContext.nutrition,
+      }
+    ),
+  ]);
 
   // ─── 6. BUILD MULTI-DOMAIN COMPONENTS ──────────────────────────────────
   const components = buildComponents(
@@ -410,7 +412,7 @@ function buildComponents(
   }
 
   // Psychology component
-  let mentalReadiness = readiness.domains.mental;
+  const mentalReadiness = readiness.domains.mental;
   let psychAdvice = 'Mental state is optimal. Focus on process goals during training.';
   if (mentalReadiness < 50) {
     psychAdvice = 'Mental fatigue detected. Use visualization and breathing exercises. We have simplified your session to focus on the wins.';
@@ -424,7 +426,6 @@ function buildComponents(
   }
 
   // Nutrition component
-  let nutritionAdvice = 'Maintain regular nutrition pattern. Ensure adequate protein intake (1.6-2.2g/kg).';
   let hydrationPriority = false;
   if (decision === 'RECOVER') {
     hydrationPriority = true;
@@ -883,37 +884,6 @@ function calculateDataCompleteness(params: any): number {
   return Math.round((filled / fields) * 100);
 }
 
-function getSportDrills(sport: string, level: 'peak' | 'standard' | 'technical'): string[] {
-  const DRILL_MAP: Record<string, Record<string, string[]>> = {
-    football: {
-      peak: ['Match-intensity tactical drills', 'High-speed running intervals', 'Position-specific scenarios', 'Small-sided games (high press)'],
-      standard: ['Passing patterns', 'Possession drills', 'Aerobic conditioning', 'Set-piece practice'],
-      technical: ['Ball mastery drills', 'First touch exercises', 'Tactical positioning walks', 'Video analysis review'],
-    },
-    cricket: {
-      peak: ['Net session (full intensity)', 'Match simulation', 'Fielding drills (high intensity)', 'Sprint between wickets'],
-      standard: ['Rhythmic bowling practice', 'Batting against throw-downs', 'Catching circuits'],
-      technical: ['Stance correction drills', 'Shadow batting', 'Grip and release work', 'Footwork patterns'],
-    },
-    badminton: {
-      peak: ['Full-court rally drills', 'Jump smash practice', 'Speed shadow footwork', 'Competitive sets'],
-      standard: ['Multi-shuttle exercises', 'Half-court rallies', 'Net play practice'],
-      technical: ['Stroke correction', 'Footwork shadow', 'Grip technique', 'Tactical movement patterns'],
-    },
-    athletics: {
-      peak: ['Sprint intervals (95%)', 'Plyometric circuits', 'Event-specific technique', 'Time trials'],
-      standard: ['Tempo runs', 'Block starts (70%)', 'Drills (A-skip, B-skip)', 'Stride-outs'],
-      technical: ['Running mechanics drills', 'Hurdle walkovers', 'Start position practice'],
-    },
-  };
-
-  return DRILL_MAP[sport]?.[level] || DRILL_MAP['football']?.[level] || [
-    'Sport-specific warm-up',
-    'Skill-based training',
-    'Conditioning work',
-  ];
-}
-
 // ─── LEGACY V4 DECISION (BACKWARD COMPAT) ────────────────────────────────
 
 export function generateDecision(
@@ -968,8 +938,8 @@ export function generateDecision(
   const logs: string[] = [];
   logs.push(`Readiness: ${rScore} | Risk: ${riskScore} | Confidence: ${Math.round(confScore * 100)}%`);
 
-  let trendBias = trendSignal > 2 ? 10 : (trendSignal < -2 ? -15 : 0);
-  let uncertaintyBias = uncertainty.score > 0.6 ? -25 : (uncertainty.score > 0.4 ? -10 : 0);
+  const trendBias = trendSignal > 2 ? 10 : (trendSignal < -2 ? -15 : 0);
+  const uncertaintyBias = uncertainty.score > 0.6 ? -25 : (uncertainty.score > 0.4 ? -10 : 0);
   cap = Math.max(20, Math.min(110, cap + trendBias + uncertaintyBias));
 
   if (confScore < 0.6) {

@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { fitStartSaveSchema, saveFitStartProfileForUser } from '@/lib/fitstart'
 import { authenticateMobileApiRequest } from '@/lib/mobile/auth'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -31,9 +30,8 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
   const result = await saveFitStartProfileForUser({
-    supabase,
+    supabase: auth.supabase,
     userId: auth.user.userId,
     payload: parsed.data,
   })

@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { buildAthleteEventPrepPlan } from '@/lib/athlete-events'
 import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/auth'
 import { handleApiError } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(
   request: NextRequest,
@@ -20,10 +19,9 @@ export async function GET(
   }
 
   const { id } = await params
-  const supabase = createAdminClient()
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await auth.supabase
       .from('platform_events')
       .select('*')
       .eq('id', id)

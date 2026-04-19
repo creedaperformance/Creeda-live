@@ -34,10 +34,10 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const admin = createAdminClient()
+  const adminLookupSupabase = createAdminClient()
   const result = await submitAthleteOnboardingForUser({
-    supabase: admin,
-    adminLookupSupabase: admin,
+    supabase: auth.supabase,
+    adminLookupSupabase,
     userId: auth.user.userId,
     payload: parsed.data,
     auditMeta: {

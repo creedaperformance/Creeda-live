@@ -1,4 +1,4 @@
-import { AthleteInput, LoadOutput } from './types';
+import { AthleteInput, LoadOutput, LegacyHistoryLog } from './types';
 
 /**
  * CREEDA V4: LOAD SERVICE
@@ -6,7 +6,7 @@ import { AthleteInput, LoadOutput } from './types';
  */
 
 export function calculateLoad(input: AthleteInput): LoadOutput {
-  const { session, history, context } = input;
+  const { session, history } = input;
   const rpe = session?.rpe || 0;
   const duration = session?.duration_minutes || 0;
   const tags = session?.tags || [];
@@ -33,7 +33,7 @@ export function calculateLoad(input: AthleteInput): LoadOutput {
     const dominantType = sortedTypes[0];
     
     if (dominantType && typeFreq[dominantType] >= 3) {
-      inferredType = dominantType as any;
+      inferredType = normalizeSessionType(dominantType) || inferredType;
     } else {
       // B. Heuristic Fallback (RPE/Duration)
       if (rpe >= 8 && duration < 60) inferredType = "speed";
@@ -92,7 +92,7 @@ export function calculateLoad(input: AthleteInput): LoadOutput {
     : 1.0;
 
   const safeAvg = isNaN(avgLoad) ? dailyTotal : avgLoad;
-  const monotony = Number((safeAvg / (stdDev || 1.0)).toFixed(2));
+  const monotony = stdDev > 0 ? Number((safeAvg / stdDev).toFixed(2)) : 1.0;
   const strain = dailyTotal * monotony;
 
   return {
@@ -110,7 +110,12 @@ export function calculateLoad(input: AthleteInput): LoadOutput {
   };
 }
 
-function extractSessionType(log: any): string | null {
+function normalizeSessionType(value: string | null | undefined): NonNullable<AthleteInput['session']>['type'] | null {
+  if (value === 'speed' || value === 'strength' || value === 'endurance' || value === 'skill') return value;
+  return null;
+}
+
+function extractSessionType(log: LegacyHistoryLog): string | null {
   return (
     log?.session_type ||
     log?.session?.type ||
@@ -119,7 +124,7 @@ function extractSessionType(log: any): string | null {
   )
 }
 
-function extractHistoricalLoad(log: any): number {
+function extractHistoricalLoad(log: LegacyHistoryLog): number {
   const direct = Number(log?.load_score ?? log?.load)
   if (Number.isFinite(direct) && direct > 0) return direct
 

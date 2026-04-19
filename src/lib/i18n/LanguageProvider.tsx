@@ -3,6 +3,10 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
 
 export type Language = 'en' | 'hi'
+type TranslationValue = string | TranslationDictionary
+interface TranslationDictionary {
+  [key: string]: TranslationValue
+}
 
 interface LanguageContextType {
   language: Language
@@ -14,26 +18,47 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 // Flat key lookup with dot notation: t('nav.home') => translations.nav.home
-function getNestedValue(obj: Record<string, any>, path: string): string | undefined {
-  const result: unknown = path.split('.').reduce<any>((acc, part) => {
-    if (acc && typeof acc === 'object') return acc[part]
-    return undefined
-  }, obj)
-  return typeof result === 'string' ? result : undefined
+function isLanguage(value: string | null): value is Language {
+  return value === 'en' || value === 'hi'
+}
+
+function isTranslationDictionary(value: TranslationValue | undefined): value is TranslationDictionary {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function getNestedValue(obj: TranslationDictionary, path: string): string | undefined {
+  let current: TranslationValue | undefined = obj
+
+  for (const part of path.split('.')) {
+    if (!isTranslationDictionary(current)) {
+      return undefined
+    }
+
+    current = current[part]
+  }
+
+  return typeof current === 'string' ? current : undefined
+}
+
+function getInitialLanguage(): Language {
+  if (typeof window === 'undefined') return 'en'
+
+  const saved = window.localStorage.getItem('creeda-lang')
+  return isLanguage(saved) ? saved : 'en'
 }
 
 // Lazy-load translations
-const translationCache: Record<Language, Record<string, any> | null> = {
+const translationCache: Record<Language, TranslationDictionary | null> = {
   en: null,
   hi: null,
 }
 
-async function loadTranslations(lang: Language): Promise<Record<string, any>> {
+async function loadTranslations(lang: Language): Promise<TranslationDictionary> {
   if (translationCache[lang]) return translationCache[lang]!
   
   try {
-    const module = await import(`./translations/${lang}.json`)
-    translationCache[lang] = module.default || module
+    const messagesModule = await import(`./translations/${lang}.json`)
+    translationCache[lang] = messagesModule.default || messagesModule
     return translationCache[lang]!
   } catch (e) {
     console.warn(`[i18n] Failed to load ${lang} translations:`, e)
@@ -42,26 +67,25 @@ async function loadTranslations(lang: Language): Promise<Record<string, any>> {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('en')
-  const [translations, setTranslations] = useState<Record<string, any>>({})
-
-  // Load saved language preference
-  useEffect(() => {
-    const saved = localStorage.getItem('creeda-lang') as Language
-    if (saved && (saved === 'en' || saved === 'hi')) {
-      setLanguageState(saved)
-    }
-  }, [])
+  const [language, setLanguageState] = useState<Language>(getInitialLanguage)
+  const [translations, setTranslations] = useState<TranslationDictionary>({})
 
   // Load translations when language changes
   useEffect(() => {
-    loadTranslations(language).then(setTranslations)
+    let cancelled = false
+    loadTranslations(language).then((nextTranslations) => {
+      if (!cancelled) setTranslations(nextTranslations)
+    })
     document.documentElement.lang = language
+
+    return () => {
+      cancelled = true
+    }
   }, [language])
 
   const setLanguage = useCallback((lang: Language) => {
     setLanguageState(lang)
-    localStorage.setItem('creeda-lang', lang)
+    window.localStorage.setItem('creeda-lang', lang)
   }, [])
 
   const t = useCallback((key: string, fallback?: string): string => {

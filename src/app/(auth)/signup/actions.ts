@@ -14,16 +14,20 @@ import {
 import { getRoleOnboardingRoute, isAppRole } from '@/lib/role_routes'
 
 export async function signup(formData: FormData) {
-  const email = formData.get('email') as string
-  const password = formData.get('password') as string
+  const email = String(formData.get('email') || '').trim()
+  const password = String(formData.get('password') || '')
+  const fullName = String(formData.get('full_name') || '').trim()
+  const role = String(formData.get('role') || '').trim() // 'athlete', 'coach', or 'individual'
+
+  if (!email || !password || !fullName || !role) {
+    return { error: 'All fields are required' }
+  }
 
   // Rate Limit: Max 3 signup attempts per hour per email
   const limiter = await rateLimit(`signup:${email.toLowerCase()}`, 3, 3600, {
     failOpen: false,
   })
   if (!limiter.success) return { error: limiter.error }
-  const fullName = formData.get('full_name') as string
-  const role = formData.get('role') as string // 'athlete', 'coach', or 'individual'
   const coachLockerCode = formData.get('coach_locker_code') as string | null
   const legacyConsent = formData.get('consent') === 'on'
   const termsPrivacyConsent =
@@ -33,10 +37,6 @@ export async function signup(formData: FormData) {
   const dataProcessingConsent = formData.get('data_processing_consent') === 'on'
   const aiAcknowledgementConsent = formData.get('ai_acknowledgement_consent') === 'on'
   const marketingConsent = formData.get('marketing_consent') === 'on'
-
-  if (!email || !password || !fullName || !role) {
-    return { error: 'All fields are required' }
-  }
 
   if (!termsPrivacyConsent || !medicalDisclaimerConsent || !dataProcessingConsent || !aiAcknowledgementConsent) {
     return { error: 'Please complete all required legal acknowledgements to continue.' }

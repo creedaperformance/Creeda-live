@@ -1,6 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { getCanonicalHost, getCanonicalProtocol } from '@/lib/seo/site'
+import { buildContentSecurityPolicy } from '@/lib/security/csp'
 import { updateSession } from '@/lib/supabase/middleware'
 
 const MAX_API_REQUEST_BYTES = 10 * 1024 * 1024
@@ -67,8 +68,16 @@ function maybeRedirectToCanonicalUrl(request: NextRequest) {
   return NextResponse.redirect(redirectUrl, 308)
 }
 
+function generateNonce() {
+  const bytes = new Uint8Array(16)
+  crypto.getRandomValues(bytes)
+  return btoa(String.fromCharCode(...bytes))
+}
+
 export async function proxy(request: NextRequest) {
   const requestId = crypto.randomUUID()
+  const nonce = generateNonce()
+  const contentSecurityPolicy = buildContentSecurityPolicy(nonce)
   const pathname = request.nextUrl.pathname
 
   if (pathname.includes('..')) {
@@ -95,9 +104,12 @@ export async function proxy(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers)
   requestHeaders.set('x-request-id', requestId)
+  requestHeaders.set('x-nonce', nonce)
+  requestHeaders.set('Content-Security-Policy', contentSecurityPolicy)
 
   const response = await updateSession(request, requestHeaders)
   response.headers.set('X-Request-Id', requestId)
+  response.headers.set('Content-Security-Policy', contentSecurityPolicy)
 
   if (shouldDisableCache(pathname)) {
     response.headers.set('Cache-Control', 'private, no-store, no-cache, max-age=0, must-revalidate')

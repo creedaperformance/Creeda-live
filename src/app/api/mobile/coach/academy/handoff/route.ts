@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { markGuardianHandoffSentForCoach } from '@/lib/coach-academy'
 import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/auth'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -34,9 +33,8 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
   const result = await markGuardianHandoffSentForCoach(
-    supabase,
+    auth.supabase,
     auth.user.userId,
     athleteId
   )

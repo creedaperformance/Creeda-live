@@ -65,6 +65,7 @@ export function AdaptiveFormWizard({
   successFallbackPath,
 }: AdaptiveFormWizardProps) {
   const router = useRouter()
+  const submitAbortRef = useRef<AbortController | null>(null)
 
   function resolveInitialStepIndex(resolvedAnswers: AnswerRecord) {
     const visible = getVisibleSteps(flow, resolvedAnswers, context)
@@ -344,52 +345,71 @@ export function AdaptiveFormWizard({
     if (!validateCurrentStep()) return
 
     if (safeStepIndex >= visibleSteps.length - 1) {
+      submitAbortRef.current?.abort()
+      const submitController = new AbortController()
+      submitAbortRef.current = submitController
       setLoading(true)
       setError(null)
-      const response = await submitAction(answers)
-      setLoading(false)
 
-      if ('error' in response && response.error) {
-        setError(String(response.error))
-        return
+      try {
+        const response = await submitAction(answers)
+        if (submitController.signal.aborted) return
+
+        if ('error' in response && response.error) {
+          setError(String(response.error))
+          return
+        }
+
+        if (currentStep) {
+          trackStepCompletion(currentStep.id, currentFieldIds, true)
+        }
+
+        if (!completedEventSentRef.current) {
+          completedEventSentRef.current = true
+          const pathContext = getPathContext()
+
+          void trackAdaptiveFormEvent({
+            eventName: 'adaptive_form_completed',
+            role: flow.userType,
+            flowId: flow.id,
+            flowVersion: flow.version,
+            flowKind: flow.kind,
+            sessionId,
+            stepId: currentStep?.id ?? null,
+            questionId: currentFieldIds[0] ?? null,
+            entrySource,
+            entryMode,
+            eventProperties: {
+              ...pathContext,
+              durationMs: Date.now() - startedAt,
+              stepViews: viewedKeysRef.current.size,
+              stepCompletions: stepCompletionCountRef.current,
+              trackedQuestionCount: trackedQuestionIds.length,
+              resolvedTrackedQuestionCount: resolvedQuestionIdsRef.current.size,
+              resolvedTrackedQuestionIds: Array.from(resolvedQuestionIdsRef.current),
+              advancedLogging,
+              finalCompletionScore: getCompletionPercentage({ flow, answers, context: liveContext }),
+              finalConfidenceScore: confidence.score,
+            },
+          })
+        }
+
+        clearDraft(flow.id, userId)
+        setResult(response)
+      } catch (error) {
+        if (!submitController.signal.aborted) {
+          setError(error instanceof Error ? error.message : 'We could not submit this form. Please try again.')
+        }
+      } finally {
+        if (submitAbortRef.current === submitController) {
+          submitAbortRef.current = null
+        }
+
+        if (!submitController.signal.aborted) {
+          setLoading(false)
+        }
       }
 
-      if (currentStep) {
-        trackStepCompletion(currentStep.id, currentFieldIds, true)
-      }
-
-      if (!completedEventSentRef.current) {
-        completedEventSentRef.current = true
-        const pathContext = getPathContext()
-
-        void trackAdaptiveFormEvent({
-          eventName: 'adaptive_form_completed',
-          role: flow.userType,
-          flowId: flow.id,
-          flowVersion: flow.version,
-          flowKind: flow.kind,
-          sessionId,
-          stepId: currentStep?.id ?? null,
-          questionId: currentFieldIds[0] ?? null,
-          entrySource,
-          entryMode,
-          eventProperties: {
-            ...pathContext,
-            durationMs: Date.now() - startedAt,
-            stepViews: viewedKeysRef.current.size,
-            stepCompletions: stepCompletionCountRef.current,
-            trackedQuestionCount: trackedQuestionIds.length,
-            resolvedTrackedQuestionCount: resolvedQuestionIdsRef.current.size,
-            resolvedTrackedQuestionIds: Array.from(resolvedQuestionIdsRef.current),
-            advancedLogging,
-            finalCompletionScore: getCompletionPercentage({ flow, answers, context: liveContext }),
-            finalConfidenceScore: confidence.score,
-          },
-        })
-      }
-
-      clearDraft(flow.id, userId)
-      setResult(response)
       return
     }
 
@@ -399,6 +419,12 @@ export function AdaptiveFormWizard({
 
     setStepIndex((current) => Math.min(current + 1, Math.max(visibleSteps.length - 1, 0)))
   }
+
+  useEffect(() => {
+    return () => {
+      submitAbortRef.current?.abort()
+    }
+  }, [])
 
   function renderField(field: FormFieldDefinition) {
     const value = answers[field.id] ?? buildDefaultValue(field)

@@ -6,7 +6,6 @@ import {
   submitCoachOnboardingForUser,
 } from '@/lib/coach-onboarding'
 import { authenticateMobileApiRequest } from '@/lib/mobile/auth'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -34,9 +33,8 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
   const result = await submitCoachOnboardingForUser({
-    supabase,
+    supabase: auth.supabase,
     userId: auth.user.userId,
     payload: parsed.data,
   })

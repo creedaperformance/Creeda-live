@@ -13,7 +13,9 @@ export async function submitAthleteDailyCheckIn(rawData: unknown) {
     const { user } = await verifyRole('athlete')
     const supabase = await createClient()
 
-    const limiter = await rateLimit(`athlete_daily_checkin:${user.id}`, 6, 3600)
+    const limiter = await rateLimit(`athlete_daily_checkin:${user.id}`, 6, 3600, {
+      failOpen: false,
+    })
     if (!limiter.success) return { error: limiter.error }
 
     const response = await submitAthleteDailyCheckInForUser({

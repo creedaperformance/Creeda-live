@@ -1,54 +1,16 @@
 import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV !== "production";
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const googleTagManagerOrigin = "https://www.googletagmanager.com";
-const googleAnalyticsOrigins = [
-  "https://www.google-analytics.com",
-  "https://region1.google-analytics.com",
-];
-let supabaseOrigin: string | null = null;
-try {
-  supabaseOrigin = supabaseUrl ? new URL(supabaseUrl).origin : null;
-} catch {
-  supabaseOrigin = null;
-}
-const supabaseWssOrigin = supabaseOrigin
-  ? supabaseOrigin.replace(/^http:/, "ws:").replace(/^https:/, "wss:")
-  : null;
-const connectSrc = [
-  "'self'",
-  "https://cdn.jsdelivr.net",
-  googleTagManagerOrigin,
-  ...googleAnalyticsOrigins,
-  ...(supabaseOrigin ? [supabaseOrigin] : []),
-  ...(supabaseWssOrigin ? [supabaseWssOrigin] : []),
-].join(" ");
-
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${googleTagManagerOrigin}`,
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "img-src 'self' data: blob: https:",
-  "font-src 'self' data: https://fonts.gstatic.com",
-  `connect-src ${connectSrc}`,
-  "media-src 'self' blob: https:",
-  "worker-src 'self' blob:",
-  "child-src 'self' blob:",
-  "frame-src 'none'",
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "object-src 'none'",
-  "manifest-src 'self'",
-  "report-uri /api/security/csp-report",
-].join("; ");
 
 const securityHeaders = [
-  {
-    key: "Content-Security-Policy",
-    value: contentSecurityPolicy,
-  },
+  ...(!isDev
+    ? [
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=31536000; includeSubDomains; preload",
+        },
+      ]
+    : []),
   {
     key: "X-DNS-Prefetch-Control",
     value: "off",
@@ -75,7 +37,7 @@ const securityHeaders = [
   },
   {
     key: "Cross-Origin-Resource-Policy",
-    value: "same-site",
+    value: "same-origin",
   },
   {
     key: "Origin-Agent-Cluster",

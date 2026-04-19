@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Noto_Sans_Devanagari, Poppins } from "next/font/google";
+import { headers } from "next/headers";
 import Script from "next/script";
 import { Suspense } from "react";
 
@@ -150,17 +151,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html lang={SITE_LANGUAGE} className="dark">
       <head>
         <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt" />
-        <JsonLd data={createOrganizationSchema()} />
-        <JsonLd data={createWebSiteSchema()} />
+        <JsonLd data={createOrganizationSchema()} nonce={nonce} />
+        <JsonLd data={createWebSiteSchema()} nonce={nonce} />
       </head>
       <body
         className={`${poppins.variable} ${geistMono.variable} ${notoDevanagari.variable} antialiased`}
@@ -184,9 +187,9 @@ export default function RootLayout({
           <CookieNotice />
         </LanguageProvider>
         <Suspense fallback={null}>
-          <GoogleAnalytics measurementId={googleAnalyticsMeasurementId} />
+          <GoogleAnalytics measurementId={googleAnalyticsMeasurementId} nonce={nonce} />
         </Suspense>
-        <Script src="/sw-register.js" strategy="afterInteractive" />
+        <Script src="/sw-register.js" strategy="afterInteractive" nonce={nonce} />
       </body>
     </html>
   );

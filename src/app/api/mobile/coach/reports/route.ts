@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/auth'
 import { handleApiError } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { getCoachVideoReports } from '@/lib/video-analysis/service'
 
 export async function GET(request: NextRequest) {
@@ -16,10 +15,8 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
-
   try {
-    const reports = await getCoachVideoReports(supabase, auth.user.userId, 36)
+    const reports = await getCoachVideoReports(auth.supabase, auth.user.userId, 36)
 
     return NextResponse.json({
       success: true,

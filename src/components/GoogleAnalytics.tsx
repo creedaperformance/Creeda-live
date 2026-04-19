@@ -18,10 +18,12 @@ declare global {
 
 type GoogleAnalyticsProps = {
   measurementId: string;
+  nonce?: string;
 };
 
 export function GoogleAnalytics({
   measurementId,
+  nonce,
 }: GoogleAnalyticsProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -68,8 +70,9 @@ export function GoogleAnalytics({
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
         strategy="afterInteractive"
+        nonce={nonce}
       />
-      <Script id="google-analytics" strategy="afterInteractive">
+      <Script id="google-analytics" strategy="afterInteractive" nonce={nonce}>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

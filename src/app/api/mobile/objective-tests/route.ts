@@ -11,7 +11,6 @@ import {
 } from '@/lib/objective-tests/store'
 import type { ObjectiveTestSession } from '@/lib/objective-tests/types'
 import { handleApiError } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -24,10 +23,8 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
-
   try {
-    const { data: sessionsData, error: sessionsError } = await supabase
+    const { data: sessionsData, error: sessionsError } = await auth.supabase
       .from('objective_test_sessions')
       .select('*')
       .eq('user_id', auth.user.userId)

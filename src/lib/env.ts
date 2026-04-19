@@ -65,10 +65,22 @@ export function getDatabaseUrl() {
 
 export function getSiteUrl() {
   const candidate = process.env.NEXT_PUBLIC_SITE_URL?.trim()
-  if (!candidate) return DEFAULT_SITE_URL
+  if (!candidate) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('NEXT_PUBLIC_SITE_URL is required in production.')
+    }
+
+    return DEFAULT_SITE_URL
+  }
 
   const parsed = z.string().url().safeParse(candidate)
-  if (!parsed.success) return DEFAULT_SITE_URL
+  if (!parsed.success) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('NEXT_PUBLIC_SITE_URL must be a valid URL in production.')
+    }
+
+    return DEFAULT_SITE_URL
+  }
 
   return parsed.data.replace(/\/+$/, '')
 }

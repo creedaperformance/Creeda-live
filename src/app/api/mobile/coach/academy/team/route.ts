@@ -5,7 +5,6 @@ import {
   updateCoachAcademyTeamSettingsForCoach,
 } from '@/lib/coach-academy'
 import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/auth'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -29,9 +28,8 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
   const result = await updateCoachAcademyTeamSettingsForCoach(
-    supabase,
+    auth.supabase,
     auth.user.userId,
     payload
   )

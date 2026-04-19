@@ -9,6 +9,7 @@ export function AuthListener() {
   const router = useRouter()
 
   useEffect(() => {
+    let mounted = true
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
 
@@ -29,6 +30,8 @@ export function AuthListener() {
           .eq('id', session.user.id)
           .maybeSingle()
 
+        if (!mounted) return
+
         if (profile && profile.onboarding_completed === false) {
            const isAlreadyOnOnboarding =
              window.location.pathname.startsWith('/onboarding') ||
@@ -43,6 +46,7 @@ export function AuthListener() {
     })
 
     return () => {
+      mounted = false
       subscription.unsubscribe()
     }
   }, [router])

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/auth'
 import { handleApiError } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -15,13 +14,21 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
+  const requestedLimit = Number(request.nextUrl.searchParams.get('limit') || 50)
+  const requestedOffset = Number(request.nextUrl.searchParams.get('offset') || 0)
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.max(1, Math.min(100, Math.trunc(requestedLimit)))
+    : 50
+  const offset = Number.isFinite(requestedOffset)
+    ? Math.max(0, Math.trunc(requestedOffset))
+    : 0
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = await auth.supabase
       .from('platform_events')
       .select('*')
       .order('event_date', { ascending: true })
+      .range(offset, offset + limit - 1)
 
     if (error) {
       throw new Error(error.message)
@@ -42,6 +49,11 @@ export async function GET(request: NextRequest) {
       success: true,
       user: serializeMobileUser(auth.user),
       events,
+      pagination: {
+        limit,
+        offset,
+        nextOffset: events.length === limit ? offset + limit : null,
+      },
     })
   } catch (error) {
     return handleApiError(request, error, {

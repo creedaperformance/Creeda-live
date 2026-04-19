@@ -5,7 +5,6 @@ import {
   getCoachWeeklyReviewSnapshot,
   getIndividualDashboardSnapshot,
 } from '@/lib/dashboard_decisions'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/auth'
 import {
   buildMobileAthleteDashboard,
@@ -18,11 +17,9 @@ export async function GET(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
   if (!auth.ok) return auth.response
 
-  const supabase = createAdminClient()
-
   try {
     if (auth.user.profile.role === 'athlete') {
-      const snapshot = await getAthleteDashboardSnapshot(supabase, auth.user.userId)
+      const snapshot = await getAthleteDashboardSnapshot(auth.supabase, auth.user.userId)
       return NextResponse.json({
         success: true,
         user: serializeMobileUser(auth.user),
@@ -31,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (auth.user.profile.role === 'coach') {
-      const review = await getCoachWeeklyReviewSnapshot(supabase, auth.user.userId)
+      const review = await getCoachWeeklyReviewSnapshot(auth.supabase, auth.user.userId)
       return NextResponse.json({
         success: true,
         user: serializeMobileUser(auth.user),
@@ -39,7 +36,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const snapshot = await getIndividualDashboardSnapshot(supabase, auth.user.userId)
+    const snapshot = await getIndividualDashboardSnapshot(auth.supabase, auth.user.userId)
     return NextResponse.json({
       success: true,
       user: serializeMobileUser(auth.user),

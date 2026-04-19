@@ -22,6 +22,7 @@ export function calculateRisk(
   const { fatigue_sensitivity } = adaptation_profile;
   const pain = input.wellness.current_pain_level || 0;
   const motivation = input.wellness.motivation || 50; // Behavioral signal
+  const clampInteractionImpact = (impact: number) => Math.max(0, Math.min(100, Math.round(impact)));
 
   let riskBase = 0;
   const interactions: RiskOutput['interactions'] = [];
@@ -36,7 +37,7 @@ export function calculateRisk(
   const nmInteraction = sigmoid((load.neuromuscular * 10 - readiness.domains.neuromuscular) / 10, 0.5);
   const nmImpact = nmInteraction * 40;
   riskBase += nmImpact;
-  interactions.push({ name: 'Neuromuscular Interaction', impact: Math.round(nmImpact) });
+  interactions.push({ name: 'Neuromuscular Interaction', impact: clampInteractionImpact(nmImpact) });
 
   // 3. Cross-Domain Interactions (Fully Continuous)
   const metInteraction = sigmoid((40 - readiness.domains.metabolic) / 10) * sigmoid(load.neuromuscular / 5);
@@ -46,23 +47,23 @@ export function calculateRisk(
   const menImpact = menInteraction * 20;
 
   riskBase += metImpact + menImpact;
-  interactions.push({ name: 'Cross-Domain Synergy (MET/NM)', impact: Math.round(metImpact) });
-  interactions.push({ name: 'Mental/Stress Resilience', impact: Math.round(menImpact) });
+  interactions.push({ name: 'Cross-Domain Synergy (MET/NM)', impact: clampInteractionImpact(metImpact) });
+  interactions.push({ name: 'Mental/Stress Resilience', impact: clampInteractionImpact(menImpact) });
 
   // 4. Monotony & Strain Dynamics
   const monotonyFactor = sigmoid(load.monotony - 1.5, 4.0);
   const monotonyImpact = monotonyFactor * 30;
   riskBase += monotonyImpact;
-  interactions.push({ name: 'Monotony Loading', impact: Math.round(monotonyImpact) });
+  interactions.push({ name: 'Monotony Loading', impact: clampInteractionImpact(monotonyImpact) });
 
   // 5. ACWR Spike Detection (V5 Enhancement)
   let acwrImpact = 0;
   if (load.acwr > 1.5) {
     acwrImpact = (load.acwr - 1.0) * 40; // Exponential penalty above 1.5
-    interactions.push({ name: 'ACWR Spike', impact: Math.round(acwrImpact) });
+    interactions.push({ name: 'ACWR Spike', impact: clampInteractionImpact(acwrImpact) });
   } else if (load.acwr > 1.3) {
     acwrImpact = (load.acwr - 1.0) * 20;
-    interactions.push({ name: 'ACWR Caution', impact: Math.round(acwrImpact) });
+    interactions.push({ name: 'ACWR Caution', impact: clampInteractionImpact(acwrImpact) });
   }
   riskBase += acwrImpact;
 
@@ -79,7 +80,7 @@ export function calculateRisk(
     if (avgSleep < 2.5) {
       const sleepImpact = (3 - avgSleep) * 15;
       riskBase += sleepImpact;
-      interactions.push({ name: 'Chronic Sleep Deficit', impact: Math.round(sleepImpact) });
+      interactions.push({ name: 'Chronic Sleep Deficit', impact: clampInteractionImpact(sleepImpact) });
     }
   }
 
@@ -106,14 +107,14 @@ export function calculateRisk(
     
     interactions.push({ 
       name: significantFaults.length > 0 ? 'Biomechanical Faults' : 'Possible Biomechanical Issues', 
-      impact: Math.round(bioImpact) 
+      impact: clampInteractionImpact(bioImpact)
     });
   }
 
   // 9. Low Data Sensitivity Control
   if (history.length < 7) {
     riskBase *= 0.5;
-    interactions.forEach(i => i.impact = Math.round(i.impact * 0.5));
+    interactions.forEach(i => i.impact = clampInteractionImpact(i.impact * 0.5));
   }
 
   // 10. Fatigue Memory (5-day EWMA)

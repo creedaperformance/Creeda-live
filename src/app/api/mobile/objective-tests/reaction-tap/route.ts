@@ -14,7 +14,6 @@ import {
 } from '@/lib/objective-tests/reaction'
 import { rateLimit } from '@/lib/rate_limit'
 import { handleApiError } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value))
@@ -48,7 +47,9 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const limiter = await rateLimit(`objective_reaction_tap:${auth.user.userId}`, 12, 3600)
+  const limiter = await rateLimit(`objective_reaction_tap:${auth.user.userId}`, 12, 3600, {
+    failOpen: false,
+  })
   if (!limiter.success) {
     return NextResponse.json({ error: limiter.error }, { status: 429 })
   }
@@ -127,8 +128,7 @@ export async function POST(request: NextRequest) {
       },
     ]
 
-    const supabase = createAdminClient()
-    const { data: insertedSession, error: insertError } = await supabase
+    const { data: insertedSession, error: insertError } = await auth.supabase
       .from('objective_test_sessions')
       .insert({
         user_id: auth.user.userId,
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
       measurements
     )
 
-    const { error: measurementError } = await supabase
+    const { error: measurementError } = await auth.supabase
       .from('objective_test_measurements')
       .insert(measurementRows)
 

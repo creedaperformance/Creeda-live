@@ -4,7 +4,6 @@ import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/
 import { handleApiError } from '@/lib/security/http'
 import { normalizeVideoAnalysisReport } from '@/lib/video-analysis/reporting'
 import { getCoachVideoReportById } from '@/lib/video-analysis/service'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(
   request: NextRequest,
@@ -14,11 +13,10 @@ export async function GET(
   if (!auth.ok) return auth.response
 
   const { id } = await params
-  const supabase = createAdminClient()
 
   try {
     if (auth.user.profile.role === 'coach') {
-      const report = await getCoachVideoReportById(supabase, auth.user.userId, id)
+      const report = await getCoachVideoReportById(auth.supabase, auth.user.userId, id)
       if (!report) {
         return NextResponse.json({ error: 'Report not found.' }, { status: 404 })
       }
@@ -30,7 +28,7 @@ export async function GET(
       })
     }
 
-    const { data: rawReport, error: reportError } = await supabase
+    const { data: rawReport, error: reportError } = await auth.supabase
       .from('video_analysis_reports')
       .select('*')
       .eq('id', id)

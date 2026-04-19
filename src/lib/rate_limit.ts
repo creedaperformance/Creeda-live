@@ -23,7 +23,7 @@ export async function rateLimit(
 
     if (error) {
         console.error(`[Rate Limit Error] Key: ${key}`, error);
-        if (options?.failOpen === false) {
+        if (options?.failOpen !== true) {
             return {
                 success: false,
                 error: 'Rate limiting is temporarily unavailable. Please try again shortly.',

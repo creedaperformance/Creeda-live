@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAthleteMonthlyReportSnapshot } from '@/lib/athlete-monthly-report'
 import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/auth'
 import { handleApiError } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -16,10 +15,8 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
-
   try {
-    const report = await getAthleteMonthlyReportSnapshot(supabase, auth.user.userId)
+    const report = await getAthleteMonthlyReportSnapshot(auth.supabase, auth.user.userId)
 
     return NextResponse.json({
       success: true,

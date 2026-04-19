@@ -4,7 +4,6 @@ import * as z from 'zod'
 
 import { authenticateMobileApiRequest } from '@/lib/mobile/auth'
 import { jsonError, jsonResponse } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 const updateMobileProfileSchema = z.object({
   full_name: z.string().min(2, 'Name is too short.').optional(),
@@ -22,6 +21,10 @@ function revalidateProfilePaths() {
   revalidatePath('/athlete')
   revalidatePath('/coach')
   revalidatePath('/dashboard')
+}
+
+function isUniqueViolation(error: { code?: string; message?: string }) {
+  return error.code === '23505' || /unique|duplicate/i.test(error.message || '')
 }
 
 export async function PATCH(request: NextRequest) {
@@ -51,28 +54,6 @@ export async function PATCH(request: NextRequest) {
 
   if (payload.username !== undefined) {
     const normalizedUsername = payload.username.trim().toLowerCase()
-    const admin = createAdminClient()
-    const { data: existingUsername, error: usernameError } = await admin
-      .from('profiles')
-      .select('id')
-      .ilike('username', normalizedUsername)
-      .neq('id', auth.user.userId)
-      .maybeSingle()
-
-    if (usernameError) {
-      return NextResponse.json(
-        { error: 'Unable to validate username right now.' },
-        { status: 500 }
-      )
-    }
-
-    if (existingUsername) {
-      return NextResponse.json(
-        { error: 'This username is already taken.' },
-        { status: 409 }
-      )
-    }
-
     updates.username = normalizedUsername
   }
 
@@ -99,13 +80,19 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'No changes provided.' }, { status: 400 })
   }
 
-  const admin = createAdminClient()
-  const { error } = await admin
+  const { error } = await auth.supabase
     .from('profiles')
     .update(updates)
     .eq('id', auth.user.userId)
 
   if (error) {
+    if (typeof updates.username === 'string' && isUniqueViolation(error)) {
+      return NextResponse.json(
+        { error: 'This username is already taken.' },
+        { status: 409 }
+      )
+    }
+
     return jsonError(request, 400, 'Unable to update profile right now.')
   }
 

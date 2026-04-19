@@ -88,8 +88,13 @@ export function calculateReadiness(
     baseWeights = { nm: 0.20, met: 0.50, men: 0.30 };
   }
 
-  const weight_sleep = 0.4 * (1 + fatigue_sensitivity * 0.2);
-  const weight_energy = 0.4 * (1 - fatigue_sensitivity * 0.1);
+  const sleepWeightBase = 0.4 * (1 + fatigue_sensitivity * 0.2);
+  const energyWeightBase = 0.4 * (1 - fatigue_sensitivity * 0.1);
+  const loadWeightBase = 0.2;
+  const metabolicWeightTotal = sleepWeightBase + energyWeightBase + loadWeightBase;
+  const weight_sleep = sleepWeightBase / metabolicWeightTotal;
+  const weight_energy = energyWeightBase / metabolicWeightTotal;
+  const weight_load = loadWeightBase / metabolicWeightTotal;
 
   // 5. Domain Calculations (Non-Linear)
   const k = 0.2; 
@@ -99,7 +104,7 @@ export function calculateReadiness(
   const nmRaw = (soreness * 0.5 + (100 - (loadOutput.neuromuscular)) * 0.3 + (100 - cns_fatigue) * 0.2);
   const nmReadiness = Math.max(0, Math.min(100, nmRaw - (soreness_penalty * fatigue_sensitivity * 0.5)));
 
-  const metRaw = (sleep * weight_sleep + energy * weight_energy + (100 - loadOutput.metabolic) * 0.2) - metabolicContextPenalty;
+  const metRaw = (sleep * weight_sleep + energy * weight_energy + (100 - loadOutput.metabolic) * weight_load) - metabolicContextPenalty;
   const metabolicReadiness = Math.max(0, Math.min(100, metRaw));
 
   const mentalRaw = (motivation * 0.6 + stress * 0.4) - mentalContextPenalty;

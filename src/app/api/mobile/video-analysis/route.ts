@@ -4,7 +4,6 @@ import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/
 import { handleApiError } from '@/lib/security/http'
 import { listVideoAnalysisSports } from '@/lib/video-analysis/catalog'
 import { getUserVideoReports } from '@/lib/video-analysis/service'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -17,14 +16,12 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
-
   try {
     let preferredSport =
       auth.user.profile.role === 'athlete' ? auth.user.profile.primarySport : null
 
     if (auth.user.profile.role === 'individual') {
-      const { data: individualProfile, error: individualProfileError } = await supabase
+      const { data: individualProfile, error: individualProfileError } = await auth.supabase
         .from('individual_profiles')
         .select('sport_profile')
         .eq('id', auth.user.userId)
@@ -40,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     const [recentReports, sports] = await Promise.all([
-      getUserVideoReports(supabase, auth.user.userId, 8),
+      getUserVideoReports(auth.supabase, auth.user.userId, 8),
       Promise.resolve(listVideoAnalysisSports(preferredSport)),
     ])
 

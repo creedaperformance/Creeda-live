@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getIndividualWeeklyReviewSnapshot } from '@/lib/dashboard_decisions'
 import { authenticateMobileApiRequest, serializeMobileUser } from '@/lib/mobile/auth'
 import { handleApiError } from '@/lib/security/http'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(request: NextRequest) {
   const auth = await authenticateMobileApiRequest(request)
@@ -16,10 +15,8 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const supabase = createAdminClient()
-
   try {
-    const review = await getIndividualWeeklyReviewSnapshot(supabase, auth.user.userId)
+    const review = await getIndividualWeeklyReviewSnapshot(auth.supabase, auth.user.userId)
 
     if (!review) {
       return NextResponse.json(
