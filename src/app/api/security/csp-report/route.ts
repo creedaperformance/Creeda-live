@@ -4,12 +4,23 @@ import { jsonError } from '@/lib/security/http'
 
 export async function POST(request: NextRequest) {
   const contentType = request.headers.get('content-type') || ''
-  if (!contentType.toLowerCase().includes('application/json')) {
-    return jsonError(request, 415, 'Unsupported content type. Expected application/json.')
+  const normalizedContentType = contentType.toLowerCase()
+  const isSupportedReportType =
+    normalizedContentType.includes('application/json') ||
+    normalizedContentType.includes('application/csp-report') ||
+    normalizedContentType.includes('application/reports+json')
+
+  if (!isSupportedReportType) {
+    return jsonError(
+      request,
+      415,
+      'Unsupported content type. Expected a JSON-compatible CSP report.'
+    )
   }
 
   try {
-    const payload = await request.json()
+    const rawPayload = await request.text()
+    const payload = rawPayload ? JSON.parse(rawPayload) : {}
     console.warn('[security/csp-report] violation', {
       requestId: request.headers.get('x-request-id') || undefined,
       report: payload,

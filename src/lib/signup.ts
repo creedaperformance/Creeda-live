@@ -6,7 +6,7 @@ import { persistLegalConsentBundle } from '@/lib/legal/compliance'
 import { isAppRole, type AppRole } from '@/lib/role_routes'
 
 const signupRoleSchema = z.enum(['athlete', 'coach', 'individual'])
-const strongPasswordSchema = z
+export const strongPasswordSchema = z
   .string()
   .min(12, 'Password must be at least 12 characters long.')
   .regex(/[a-z]/, 'Password must include at least one lowercase letter.')

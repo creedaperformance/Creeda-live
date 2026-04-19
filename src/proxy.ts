@@ -19,6 +19,7 @@ function shouldDisableCache(pathname: string) {
     pathname === '/signup' ||
     pathname === '/verify-email' ||
     pathname === '/forgot-password' ||
+    pathname === '/reset-password' ||
     pathname === '/verification-success'
   )
 }
@@ -59,9 +60,10 @@ function maybeRedirectToCanonicalUrl(request: NextRequest) {
     return null
   }
 
-  const redirectUrl = request.nextUrl.clone()
-  redirectUrl.host = canonicalHost
-  redirectUrl.protocol = `${canonicalProtocol}:`
+  const redirectUrl = new URL(
+    `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    `${canonicalProtocol}://${canonicalHost}`
+  )
   return NextResponse.redirect(redirectUrl, 308)
 }
 

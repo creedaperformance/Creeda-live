@@ -24,7 +24,10 @@ function formatIssues(result: z.ZodError) {
 }
 
 export function getPublicSupabaseEnv() {
-  const parsed = publicSupabaseEnvSchema.safeParse(process.env)
+  const parsed = publicSupabaseEnvSchema.safeParse({
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  })
   if (!parsed.success) {
     throw new Error(`Invalid public Supabase environment configuration. ${formatIssues(parsed.error)}`)
   }
@@ -33,7 +36,11 @@ export function getPublicSupabaseEnv() {
 }
 
 export function getAdminSupabaseEnv() {
-  const parsed = adminSupabaseEnvSchema.safeParse(process.env)
+  const parsed = adminSupabaseEnvSchema.safeParse({
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  })
   if (!parsed.success) {
     throw new Error(`Invalid admin Supabase environment configuration. ${formatIssues(parsed.error)}`)
   }
@@ -46,7 +53,9 @@ export function hasDatabaseUrl() {
 }
 
 export function getDatabaseUrl() {
-  const parsed = databaseEnvSchema.safeParse(process.env)
+  const parsed = databaseEnvSchema.safeParse({
+    DATABASE_URL: process.env.DATABASE_URL,
+  })
   if (!parsed.success) {
     throw new Error(`Invalid database configuration. ${formatIssues(parsed.error)}`)
   }

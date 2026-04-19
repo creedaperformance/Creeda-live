@@ -24,6 +24,7 @@ const privateDisallowRules = [
   "/signup",
   "/verify-email",
   "/forgot-password",
+  "/reset-password",
   "/verification-success",
   "/api",
   "/auth",

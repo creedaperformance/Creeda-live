@@ -273,6 +273,19 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/reset-password",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "private, no-store, no-cache, max-age=0, must-revalidate",
+          },
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow, noarchive, nosnippet",
+          },
+        ],
+      },
+      {
         source: "/verification-success",
         headers: [
           {
