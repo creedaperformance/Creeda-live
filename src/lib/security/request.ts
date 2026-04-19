@@ -1,4 +1,4 @@
-import { getSiteUrl } from '@/lib/env'
+import { getSiteUrl, getTrustedSiteOrigins } from '@/lib/env'
 
 function firstHeaderValue(value: string | null | undefined) {
   return String(value || '')
@@ -50,9 +50,8 @@ function isLoopbackHost(hostname: string) {
 function isTrustedOrigin(origin: string) {
   try {
     const candidate = new URL(origin)
-    const configured = new URL(configuredSiteOrigin())
 
-    if (candidate.origin === configured.origin) {
+    if (getTrustedSiteOrigins().includes(candidate.origin)) {
       return true
     }
 

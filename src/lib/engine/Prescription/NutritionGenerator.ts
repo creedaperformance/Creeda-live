@@ -1,4 +1,6 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { getPublicSupabaseEnv } from '@/lib/env';
+import { getOptionalSupabaseServiceRoleKey } from '@/lib/env.server';
 import { buildNutritionFramework } from './SportsScienceKnowledge';
 import type {
   AthleteSportPositionProfile,
@@ -1335,12 +1337,10 @@ export class NutritionGenerator {
 
   private async getSupabaseClient() {
     if (typeof window === 'undefined') {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      if (!url || !key) {
-        throw new Error('Supabase environment variables missing for nutrition generator.');
-      }
-      return createSupabaseClient(url, key, {
+      const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } = getPublicSupabaseEnv();
+      const key = getOptionalSupabaseServiceRoleKey() || NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      return createSupabaseClient(NEXT_PUBLIC_SUPABASE_URL, key, {
         auth: { persistSession: false, autoRefreshToken: false },
       });
     }

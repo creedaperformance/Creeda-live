@@ -5,9 +5,9 @@
  * PRINCIPLE: Every type serves ONE purpose — producing a single CreedaDecision.
  */
 
-import { WorkoutPlan } from './Prescription/WorkoutGenerator';
-import { RecommendedMeal } from './Prescription/NutritionGenerator';
-import { AthleteScientificContext } from './Prescription/AthleteScienceContext';
+import type { WorkoutPlan } from './Prescription/WorkoutGenerator';
+import type { RecommendedMeal } from './Prescription/NutritionGenerator';
+import type { AthleteScientificContext } from './Prescription/AthleteScienceContext';
 import type { AQIBand, FastingState, HeatLevel, HumidityLevel } from '@/lib/context-signals/storage';
 
 export type EngineVersion = "v3" | "v4" | "v5";

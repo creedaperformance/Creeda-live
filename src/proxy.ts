@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { isProductionRuntime } from '@/lib/env'
 import { getCanonicalHost, getCanonicalProtocol } from '@/lib/seo/site'
 import { buildContentSecurityPolicy } from '@/lib/security/csp'
 import { updateSession } from '@/lib/supabase/middleware'
@@ -26,7 +27,7 @@ function shouldDisableCache(pathname: string) {
 }
 
 function maybeRedirectToCanonicalUrl(request: NextRequest) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!isProductionRuntime()) {
     return null
   }
 

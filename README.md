@@ -1,5 +1,37 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment Configuration
+
+The web app uses a centralized env layer in `src/lib/env.ts` for public/build-safe values and `src/lib/env.server.ts` for server-only secrets. Public values may be exposed to browser bundles; server-only values must stay in GitHub/hosting secrets and must never use a `NEXT_PUBLIC_` or `EXPO_PUBLIC_` prefix.
+
+Copy `.env.example` to `.env.local` for local development. The app has a safe canonical fallback for `NEXT_PUBLIC_SITE_URL` (`https://www.creeda.in`) so static generation, metadata, sitemap, robots, and `/_not-found` do not crash during CI builds.
+
+Required for production runtime:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+Required only for privileged server operations:
+
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Optional integrations:
+
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION`
+- `NEXT_PUBLIC_BING_SITE_VERIFICATION`
+- `DATABASE_URL`
+- `INDEXNOW_KEY`
+- `INDEXNOW_API_TOKEN`
+- `EXPO_PUBLIC_SUPABASE_URL`
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+- `EXPO_PUBLIC_API_BASE_URL`
+- `DIAG_TEST_EMAIL`
+- `DIAG_TEST_PASSWORD`
+
+GitHub Actions should store `NEXT_PUBLIC_*` and `EXPO_PUBLIC_*` values as repository/environment variables (`vars`). Store `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, and `INDEXNOW_API_TOKEN` as secrets. `DIAG_TEST_EMAIL` and `DIAG_TEST_PASSWORD` are local diagnostics only and should use disposable test accounts. The security build workflow does not require server secrets.
+
 ## Getting Started
 
 First, run the development server:

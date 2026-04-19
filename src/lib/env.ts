@@ -1,90 +1,110 @@
-import * as z from 'zod'
-
 export const DEFAULT_SITE_URL = 'https://www.creeda.in'
+export const DEFAULT_GA_MEASUREMENT_ID = 'G-0GS3PDQELT'
 
-const publicSupabaseEnvSchema = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url('NEXT_PUBLIC_SUPABASE_URL must be a valid URL.'),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z
-    .string()
-    .min(1, 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required.'),
-})
+type PublicSupabaseEnv = {
+  NEXT_PUBLIC_SUPABASE_URL: string
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: string
+}
 
-const adminSupabaseEnvSchema = publicSupabaseEnvSchema.extend({
-  SUPABASE_SERVICE_ROLE_KEY: z
-    .string()
-    .min(1, 'SUPABASE_SERVICE_ROLE_KEY is required for admin access.'),
-})
-
-const databaseEnvSchema = z.object({
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required.'),
-})
-
-function formatIssues(result: z.ZodError) {
+export function formatEnvIssues(result: { issues: Array<{ message: string }> }) {
   return result.issues.map((issue) => issue.message).join(' ')
 }
 
-export function getPublicSupabaseEnv() {
-  const parsed = publicSupabaseEnvSchema.safeParse({
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  })
-  if (!parsed.success) {
-    throw new Error(`Invalid public Supabase environment configuration. ${formatIssues(parsed.error)}`)
-  }
-
-  return parsed.data
+export function readEnv(name: string) {
+  const value = process.env[name]?.trim()
+  return value || null
 }
 
-export function getAdminSupabaseEnv() {
-  const parsed = adminSupabaseEnvSchema.safeParse({
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-  })
-  if (!parsed.success) {
-    throw new Error(`Invalid admin Supabase environment configuration. ${formatIssues(parsed.error)}`)
-  }
-
-  return parsed.data
+export function getRuntimeEnvironment() {
+  return readEnv('NODE_ENV') || 'development'
 }
 
-export function hasDatabaseUrl() {
-  return Boolean(process.env.DATABASE_URL?.trim())
+export function isProductionRuntime() {
+  return getRuntimeEnvironment() === 'production'
 }
 
-export function getDatabaseUrl() {
-  const parsed = databaseEnvSchema.safeParse({
-    DATABASE_URL: process.env.DATABASE_URL,
-  })
-  if (!parsed.success) {
-    throw new Error(`Invalid database configuration. ${formatIssues(parsed.error)}`)
-  }
+export function isCiRuntime() {
+  return readEnv('CI') === 'true'
+}
 
-  return parsed.data.DATABASE_URL
+export function normalizeSiteUrl(value: string | null | undefined) {
+  const candidate = String(value || '').trim() || DEFAULT_SITE_URL
+
+  try {
+    return new URL(candidate).origin.replace(/\/+$/, '')
+  } catch {
+    return DEFAULT_SITE_URL
+  }
 }
 
 export function getSiteUrl() {
-  const candidate = process.env.NEXT_PUBLIC_SITE_URL?.trim()
-  if (!candidate) {
-    if (process.env.CI === 'true') {
-      return DEFAULT_SITE_URL
-    }
+  return normalizeSiteUrl(readEnv('NEXT_PUBLIC_SITE_URL'))
+}
 
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('NEXT_PUBLIC_SITE_URL is required in production.')
-    }
+export function getSiteOrigin() {
+  return new URL(getSiteUrl()).origin
+}
 
-    return DEFAULT_SITE_URL
+export function getTrustedSiteOrigins() {
+  const origins = new Set<string>([
+    getSiteOrigin(),
+    new URL(DEFAULT_SITE_URL).origin,
+    'https://creeda.in',
+  ])
+
+  return [...origins]
+}
+
+function parsePublicSupabaseEnv():
+  | { success: true; data: PublicSupabaseEnv }
+  | { success: false; issues: Array<{ message: string }> } {
+  const supabaseUrl = readEnv('NEXT_PUBLIC_SUPABASE_URL')
+  const supabaseAnonKey = readEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
+  const issues: Array<{ message: string }> = []
+
+  if (!supabaseUrl) {
+    issues.push({ message: 'NEXT_PUBLIC_SUPABASE_URL is required.' })
+  } else {
+    try {
+      new URL(supabaseUrl)
+    } catch {
+      issues.push({ message: 'NEXT_PUBLIC_SUPABASE_URL must be a valid URL.' })
+    }
   }
 
-  const parsed = z.string().url().safeParse(candidate)
-  if (!parsed.success) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('NEXT_PUBLIC_SITE_URL must be a valid URL in production.')
-    }
-
-    return DEFAULT_SITE_URL
+  if (!supabaseAnonKey) {
+    issues.push({ message: 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required.' })
   }
 
-  return parsed.data.replace(/\/+$/, '')
+  if (issues.length || !supabaseUrl || !supabaseAnonKey) {
+    return { success: false, issues }
+  }
+
+  return {
+    success: true,
+    data: {
+      NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey,
+    },
+  }
+}
+
+export function getOptionalPublicSupabaseEnv() {
+  const parsed = parsePublicSupabaseEnv()
+  return parsed.success ? parsed.data : null
+}
+
+export function getPublicSupabaseEnv() {
+  const parsed = parsePublicSupabaseEnv()
+  if (parsed.success) return parsed.data
+
+  throw new Error(`Invalid public Supabase environment configuration. ${formatEnvIssues(parsed)}`)
+}
+
+export function getPublicAnalyticsEnv() {
+  return {
+    googleSiteVerification: readEnv('NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION'),
+    bingSiteVerification: readEnv('NEXT_PUBLIC_BING_SITE_VERIFICATION'),
+    gaMeasurementId: readEnv('NEXT_PUBLIC_GA_MEASUREMENT_ID') || DEFAULT_GA_MEASUREMENT_ID,
+  }
 }

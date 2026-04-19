@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAnonScriptEnv } from '../env.mjs'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const { supabaseUrl, supabaseAnonKey } = getSupabaseAnonScriptEnv()
 
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function checkSchema() {
   const { data, error } = await supabase.from('daily_load_logs').select('current_pain_level').limit(1)

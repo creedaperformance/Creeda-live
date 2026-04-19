@@ -1,6 +1,7 @@
 'use server'
 
 import { generateSixDigitCode } from '@/lib/security/codes'
+import { hasAdminSupabaseEnv } from '@/lib/env.server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
@@ -30,7 +31,7 @@ async function findCoachByLockerCode(supabase: Awaited<ReturnType<typeof createC
 
   if (scopedCoach?.id) return scopedCoach as LockerCoachProfile
 
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (hasAdminSupabaseEnv()) {
     const admin = createAdminClient()
     const { data: adminCoach } = await admin
       .from('profiles')
@@ -163,7 +164,7 @@ export async function useLockerCode(token: string) {
         return { error: 'Failed to send squad connection request.' }
       }
 
-      if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      if (!hasAdminSupabaseEnv()) {
         return { error: 'Connection request system is not initialized. Please apply latest Supabase migrations.' }
       }
 

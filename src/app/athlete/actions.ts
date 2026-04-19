@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { hasAdminSupabaseEnv } from '@/lib/env.server'
 import { revalidatePath } from 'next/cache'
 
 export async function updateProfile(data: { 
@@ -95,9 +96,9 @@ export async function deleteAccount() {
   if (!user) return { error: 'Unauthorized' }
 
   // 2. Check for environment variable
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  if (!hasAdminSupabaseEnv()) {
     console.error('Delete Account Error: SUPABASE_SERVICE_ROLE_KEY is missing.')
-    return { error: 'Account deletion requires administrative permissions. Please ensure SUPABASE_SERVICE_ROLE_KEY is configured in .env.local' }
+    return { error: 'Account deletion requires administrative permissions. Please contact support.' }
   }
 
   try {

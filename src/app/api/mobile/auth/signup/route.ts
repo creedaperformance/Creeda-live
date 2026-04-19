@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 import { getPublicSupabaseEnv } from '@/lib/env'
+import { hasAdminSupabaseEnv } from '@/lib/env.server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { rateLimit } from '@/lib/rate_limit'
 import { resolveTrustedOriginFromRequest } from '@/lib/security/request'
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
 
   const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } = getPublicSupabaseEnv()
   const supabase = createClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)
-  const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : undefined
+  const admin = hasAdminSupabaseEnv() ? createAdminClient() : undefined
 
   const result = await performCreedaSignup({
     supabase,

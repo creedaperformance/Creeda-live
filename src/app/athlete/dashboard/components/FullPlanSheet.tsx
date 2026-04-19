@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Activity, Brain, ShieldAlert, HeartPulse, Zap } from "lucide-react";
-import { OrchestratorOutputV5 } from "@/lib/engine/types";
+import type { OrchestratorOutputV5 } from "@/lib/engine/types";
 
 interface Props {
   isOpen: boolean;

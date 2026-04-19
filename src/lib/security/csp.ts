@@ -1,4 +1,6 @@
-const isDev = process.env.NODE_ENV !== 'production'
+import { getOptionalPublicSupabaseEnv, isProductionRuntime } from '@/lib/env'
+
+const isDev = !isProductionRuntime()
 const googleTagManagerOrigin = 'https://www.googletagmanager.com'
 const googleAnalyticsOrigins = [
   'https://www.google-analytics.com',
@@ -8,7 +10,7 @@ const mediaPipeWasmSource =
   'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/wasm/'
 
 function getSupabaseOrigins() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseUrl = getOptionalPublicSupabaseEnv()?.NEXT_PUBLIC_SUPABASE_URL
 
   try {
     if (!supabaseUrl) return []

@@ -23,6 +23,17 @@ function stripTrailingSlash(value: string) {
   return value.replace(/\/+$/, '')
 }
 
+function normalizeOptionalUrl(value: string | undefined, fallback: string) {
+  const candidate = String(value || '').trim()
+  if (!candidate) return fallback
+
+  try {
+    return stripTrailingSlash(new URL(candidate).toString())
+  } catch {
+    return fallback
+  }
+}
+
 function getExpoExtra() {
   return ((Constants.expoConfig?.extra || {}) as ExpoExtra)
 }
@@ -44,10 +55,10 @@ const extra = getExpoExtra()
 export const mobileEnv = {
   supabaseUrl: extra.supabaseUrl || process.env.EXPO_PUBLIC_SUPABASE_URL || '',
   supabaseAnonKey: extra.supabaseAnonKey || process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '',
-  apiBaseUrl: stripTrailingSlash(
-    extra.apiBaseUrl || process.env.EXPO_PUBLIC_API_BASE_URL || resolveDevApiBaseUrl()
+  apiBaseUrl: normalizeOptionalUrl(
+    extra.apiBaseUrl || process.env.EXPO_PUBLIC_API_BASE_URL,
+    resolveDevApiBaseUrl()
   ),
 }
 
 export const hasSupabaseConfig = Boolean(mobileEnv.supabaseUrl && mobileEnv.supabaseAnonKey)
-

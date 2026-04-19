@@ -1,6 +1,6 @@
 import { NormalizedLandmark } from '@mediapipe/tasks-vision'
 import { calculateAngle2D } from './geometry'
-import { VisionFault } from '../engine/types'
+import type { VisionFault } from '../engine/types'
 import { resolveVideoAnalysisProfile } from '@/lib/video-analysis/catalog'
 
 // Standard MediaPipe Pose Landmark Indices (0-32)

@@ -1,13 +1,9 @@
 
 import { createClient } from '@supabase/supabase-js'
-import * as dotenv from 'dotenv'
-import path from 'path'
 import { processAthleticIntelligence } from '../src/lib/intelligence_engine'
+import { getScriptSupabaseAdminEnv } from './env'
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') })
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const { supabaseUrl, supabaseServiceKey } = getScriptSupabaseAdminEnv()
 
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { GeneratedExercise, WorkoutPlan } from "@/lib/engine/Prescription/WorkoutGenerator";
+import type { GeneratedExercise, WorkoutPlan } from "@/lib/engine/Prescription/WorkoutGenerator";
 import type { CreedaDecision } from "@/lib/engine/types";
 import { Info, Timer } from "lucide-react";
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSiteUrl } from '@/lib/env'
+import { getIndexNowEnv } from '@/lib/env.server'
 import { PUBLIC_URLS } from '@/lib/seo/public-urls'
 import { enforceTrustedMutationOrigin, jsonError, jsonResponse } from '@/lib/security/http'
 
@@ -36,8 +37,7 @@ export async function POST(request: Request) {
   const originViolation = enforceTrustedMutationOrigin(request)
   if (originViolation) return originViolation
 
-  const apiToken = (process.env.INDEXNOW_API_TOKEN || '').trim()
-  const indexNowKey = (process.env.INDEXNOW_KEY || '').trim()
+  const { apiToken, key: indexNowKey } = getIndexNowEnv()
   const siteUrl = normalizeSiteUrl()
 
   if (!indexNowKey) {

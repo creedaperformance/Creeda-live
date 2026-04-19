@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getSiteUrl, getPublicSupabaseEnv } from '@/lib/env'
+import { getPublicSupabaseEnv, getRuntimeEnvironment, getSiteUrl } from '@/lib/env'
 
 export async function GET() {
   try {
@@ -10,7 +10,7 @@ export async function GET() {
       {
         ok: true,
         service: 'creeda-app',
-        environment: process.env.NODE_ENV || 'development',
+        environment: getRuntimeEnvironment(),
         siteUrl: getSiteUrl(),
         timestamp: new Date().toISOString(),
       },

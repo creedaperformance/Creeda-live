@@ -1,6 +1,7 @@
 import pkg from 'pg';
+import { getDatabaseUrlWithLocalFallback } from '../env.mjs';
 const { Client } = pkg;
-const dbUrl = process.env.NEXT_PUBLIC_SUPABASE_DB_URL || process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:54322/postgres';
+const dbUrl = getDatabaseUrlWithLocalFallback();
 
 const client = new Client({ connectionString: dbUrl });
 

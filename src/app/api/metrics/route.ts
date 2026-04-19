@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getRuntimeEnvironment } from '@/lib/env'
 
 const startedAt = Date.now()
 
@@ -12,7 +13,7 @@ export async function GET() {
     `creeda_app_uptime_seconds ${uptimeSeconds}`,
     '# HELP creeda_app_build_info Static build information.',
     '# TYPE creeda_app_build_info gauge',
-    `creeda_app_build_info{service="creeda-app",environment="${process.env.NODE_ENV || 'development'}"} 1`,
+    `creeda_app_build_info{service="creeda-app",environment="${getRuntimeEnvironment()}"} 1`,
   ].join('\n')
 
   return new NextResponse(body, {

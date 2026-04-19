@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { hasAdminSupabaseEnv } from '@/lib/env.server'
 import { rateLimit } from '@/lib/rate_limit'
 import { resolveTrustedOriginFromHeaders } from '@/lib/security/request'
 import {
@@ -43,7 +44,7 @@ export async function signup(formData: FormData) {
   }
 
   const supabase = await createClient()
-  const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : undefined
+  const admin = hasAdminSupabaseEnv() ? createAdminClient() : undefined
   const headersList = await headers()
   const origin = resolveTrustedOriginFromHeaders(headersList)
   const result = await performCreedaSignup({
@@ -106,7 +107,7 @@ export async function verifyLockerCode(code: string) {
   }
 
   const supabase = await createClient()
-  const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : undefined
+  const admin = hasAdminSupabaseEnv() ? createAdminClient() : undefined
 
   const coach = await findCoachByLockerCodeWithClient({
     supabase,

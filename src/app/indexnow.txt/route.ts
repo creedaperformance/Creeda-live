@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
+import { getIndexNowEnv } from '@/lib/env.server'
 
 export function GET() {
-  const key = (process.env.INDEXNOW_KEY || '').trim()
+  const { key } = getIndexNowEnv()
   if (!key) {
     return new NextResponse('Not Found', { status: 404 })
   }
@@ -13,4 +14,3 @@ export function GET() {
     },
   })
 }
-

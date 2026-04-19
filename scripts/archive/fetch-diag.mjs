@@ -1,14 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
+import { getDiagnosticLoginEnv, getSupabaseAnonScriptEnv } from '../env.mjs'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+const { supabaseUrl, supabaseAnonKey } = getSupabaseAnonScriptEnv()
+const { email, password } = getDiagnosticLoginEnv()
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function testFetch() {
   const { data: { session }, error: authError } = await supabase.auth.signInWithPassword({
-    email: 'kunalv.physio@gmail.com',
-    password: 'kunalvarma'
+    email,
+    password,
   })
 
   if (authError) {

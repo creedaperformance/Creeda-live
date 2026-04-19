@@ -9,6 +9,7 @@ import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { Navbar } from "@/components/navbar";
 import { NavbarWrapper } from "@/components/navbar-wrapper";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { getPublicAnalyticsEnv } from "@/lib/env";
 import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
 import { Toaster } from "sonner";
 import { CookieNotice } from "@/components/CookieNotice";
@@ -32,10 +33,11 @@ import {
 } from "@/lib/seo/site";
 
 const siteUrl = getBaseUrl();
-const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
-const bingSiteVerification = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION;
-const googleAnalyticsMeasurementId =
-  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-0GS3PDQELT";
+const {
+  googleSiteVerification,
+  bingSiteVerification,
+  gaMeasurementId,
+} = getPublicAnalyticsEnv();
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -187,7 +189,7 @@ export default async function RootLayout({
           <CookieNotice />
         </LanguageProvider>
         <Suspense fallback={null}>
-          <GoogleAnalytics measurementId={googleAnalyticsMeasurementId} nonce={nonce} />
+          <GoogleAnalytics measurementId={gaMeasurementId} nonce={nonce} />
         </Suspense>
         <Script src="/sw-register.js" strategy="afterInteractive" nonce={nonce} />
       </body>

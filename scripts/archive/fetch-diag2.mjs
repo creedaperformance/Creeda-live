@@ -1,20 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
-import * as fs from 'fs'
+import { getDiagnosticLoginEnv, getSupabaseAnonScriptEnv } from '../env.mjs'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  console.log("Missing ENV vars!");
-  process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey)
+const { supabaseUrl, supabaseAnonKey } = getSupabaseAnonScriptEnv()
+const { email, password } = getDiagnosticLoginEnv()
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 async function testFetch() {
   const { data: { session }, error: authError } = await supabase.auth.signInWithPassword({
-    email: 'kunalv.physio@gmail.com',
-    password: 'kunalvarma'
+    email,
+    password,
   })
 
   if (authError) {
