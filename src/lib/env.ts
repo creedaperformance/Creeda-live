@@ -66,6 +66,10 @@ export function getDatabaseUrl() {
 export function getSiteUrl() {
   const candidate = process.env.NEXT_PUBLIC_SITE_URL?.trim()
   if (!candidate) {
+    if (process.env.CI === 'true') {
+      return DEFAULT_SITE_URL
+    }
+
     if (process.env.NODE_ENV === 'production') {
       throw new Error('NEXT_PUBLIC_SITE_URL is required in production.')
     }
